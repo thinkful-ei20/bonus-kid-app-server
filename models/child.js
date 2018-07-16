@@ -3,14 +3,19 @@
 const mongoose = require ('mongoose');
 const bcrypt = require('bcryptjs');
 
-childSarentSchema = mongoose.Schema({
+const childSchema = mongoose.Schema({
 
   name: {type: String, required: true},
   username: {type: String, required: true, unique: true},
   email: {type: String},
   password: {type: String, required: true},
   parent: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
-  task: {type: mongoose.Schema.ObjectId, ref: 'Task', required: true},
+  task: [
+    {
+      type: mongoose.Schema.ObjectId, ref: 'Task', required: true
+    }
+  ],
+  points: {type: Number, default: 0}
     
   
 });

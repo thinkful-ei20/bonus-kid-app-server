@@ -6,7 +6,8 @@ const bcrypt = require('bcryptjs');'use strict';
 const tasksSchema = mongoose.Schema({
 
   name: {type: String, required: true},
-  points: {type: Number, required: true}
+  points: {type: Number, required: true},
+  
 
 });
 
