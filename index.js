@@ -15,7 +15,6 @@ const { dbConnect } = require('./db-mongoose');
 // ROUTERS
 // const userRouter = require('./users/routes/user');
 // const authRouter = require('./users/routes/auth');
-// const questionRouter = require('./questions/routes/questions');
 
 // Express app
 const app = express();
