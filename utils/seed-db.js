@@ -3,12 +3,17 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 const { DATABASE_URL } = require('../config');
-// const Questions = require('../models/questions');
+
 const Parent = require('../models/parent');
 const Child = require('../models/child')
+const Tasks = require('../models/tasks');
+const Rewards = require('../models/rewards');
 
-const seedChild = require('../DB/seed/child');
+
 const seedParent = require('../DB/seed/parent');
+const seedChild = require('../DB/seed/child');
+const seedTasks = require('../DB/seed/tasks');
+const seedRewards = require('../DB/seed/rewards');
 
 mongoose.connect(DATABASE_URL)
   .then(() => {
@@ -21,11 +26,18 @@ mongoose.connect(DATABASE_URL)
   .then(digests => {
     seedParent.forEach((user, i) => user.password = digests[i]);
     return Promise.all([
-      // Child.insertMany(seedChild),
-      // Child.createIndexes(),
+      Child.insertMany(seedChild),
+      Child.createIndexes(),
 
       Parent.insertMany(seedParent),
-      Parent.createIndexes()
+      Parent.createIndexes(),
+
+      Tasks.insertMany(seedTasks),
+      Tasks.createIndexes(),
+
+      Rewards.insertMany(seedRewards),
+      Rewards.createIndexes()
+      
     ]);
   })
   .then(() => mongoose.disconnect())

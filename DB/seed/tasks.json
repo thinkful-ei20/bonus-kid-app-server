@@ -1,14 +1,26 @@
 [
   {
     "name": "daily chore",
-    "points": 5
+    "pointValue": 5,
+    "complete": false,
+    "child": [
+      {"id": "5b4d0890a6b4fb75280719a9"}
+    ]
   },
   {
     "name": "homework",
-    "points": 5
+    "pointValue": 5,
+    "complete": false,
+    "child": [
+      {"id": "5b4d0890a6b4fb75280719a9"}
+    ]
   },
   {
     "name": "A on a test",
-    "points": 10
+    "pointValue": 10,
+    "complete": false,
+    "child": [
+      {"id": "5b4d0890a6b4fb75280719a9"}
+    ]
   }
 ]

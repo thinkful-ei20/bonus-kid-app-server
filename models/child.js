@@ -10,9 +10,11 @@ const childSchema = mongoose.Schema({
   email: {type: String},
   password: {type: String, required: true},
   parent: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
-  task: [
+  totalPoints: {type: Number, required: true, default: 0},
+  currentPoints: {type: Number, required:true, default: 0},
+  tasks: [
     {
-      id: {type: mongoose.Schema.ObjectId, ref: 'Task', required: true}
+      id: {type: mongoose.Schema.ObjectId, ref: 'Tasks', required: true}
     }
   ],
   

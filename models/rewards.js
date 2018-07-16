@@ -6,7 +6,8 @@ const bcrypt = require('bcryptjs');'use strict';
 const rewardsSchema = mongoose.Schema({
 
   name: {type: String, required: true},
-  points: {type: Number, required: true}
+  points: {type: Number, required: true},
+  purchased: {type: Boolean, required: true, default: false}
 
 });
 
@@ -18,4 +19,4 @@ rewardsSchema.set('toObject', {
   }
 });
 
-module.exports = mongoose.model('Tasks', rewardsSchema);
+module.exports = mongoose.model('Rewards', rewardsSchema);

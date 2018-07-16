@@ -6,10 +6,17 @@ const bcrypt = require('bcryptjs');'use strict';
 const tasksSchema = mongoose.Schema({
 
   name: {type: String, required: true},
-  points: {type: Number, required: true},
+  pointValue: {type: Number, required: true},
+  child: [
+    {
+      id: {type: mongoose.Schema.ObjectId, ref: 'Child', required: true}
+    }
+  ],
+  complete: {type: Boolean, required: true},
+
   
 
-});
+}, {timestamps: true});
 
 tasksSchema.set('toObject', {
   transform: function (doc,ret) {
