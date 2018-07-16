@@ -6,9 +6,11 @@ const bcrypt = require('bcryptjs');
 childSarentSchema = mongoose.Schema({
 
   name: {type: String, required: true},
+  username: {type: String, required: true, unique: true},
+  email: {type: String},
   password: {type: String, required: true},
-  parent: {type: mongoos.Schema.ObjectId, ref: 'Parent', required: true},
-  task: {type: mongoos.Schema.ObjectId, ref: 'Task', required: true},
+  parent: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
+  task: {type: mongoose.Schema.ObjectId, ref: 'Task', required: true},
     
   
 });

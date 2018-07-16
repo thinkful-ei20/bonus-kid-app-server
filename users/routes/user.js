@@ -3,7 +3,7 @@
 const express = require('express');
 const passport = require('passport');
 
-const User = require('../../models/user');
+const User = require('../../models/parent');
 // const questions = require('../../defaultQuestions/index');
 
 const router = express.Router();
@@ -77,21 +77,16 @@ router.post('/', (req, res, next) => {
   }
 
   // Create the new user
-  let { username, password } = req.body;
-  let defaultQuestions = questions.map((question, index) => ({
-    question: question.question,
-    answer: question.answer,
-    m: 1,
-    next: index === questions.length - 1 ? null : index + 1
-  }));
+  let { username, password, name, email, isParent } = req.body;
   
   return User.hashPassword(password)
     .then(digest => {
       const newUser = {
         username, 
         password: digest,
-        questions: defaultQuestions,
-        counter: 0
+        name,
+        email,
+        isParent
       };
       return User.create(newUser);
     })
