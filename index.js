@@ -13,8 +13,8 @@ const { PORT, CLIENT_ORIGIN } = require('./config');
 const { dbConnect } = require('./db-mongoose');
 
 // ROUTERS
-// const userRouter = require('./users/routes/user');
-// const authRouter = require('./users/routes/auth');
+const userRouter = require('./users/routes/user');
+const authRouter = require('./users/routes/auth');
 
 // Express app
 const app = express();
@@ -41,8 +41,8 @@ passport.use(localStrategy);
 passport.use(jwtStrategy);
 
 // Endpoints
-// app.use('/api', authRouter);
-// app.use('/api/users', userRouter);
+app.use('/api', authRouter);
+app.use('/api/users', userRouter);
 
 // Catch-all 404
 app.use(function(req, res, next) {
@@ -50,6 +50,16 @@ app.use(function(req, res, next) {
   err.status = 404;
   console.error(err);
   next(err);
+});
+
+
+app.use((err,req,res,next) => {
+  res.status(err.status || 500);
+
+  res.json({
+    message: err.message,
+    error: err
+  });
 });
 
 function runServer(port = PORT) {
