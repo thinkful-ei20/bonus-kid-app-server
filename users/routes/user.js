@@ -123,16 +123,17 @@ router.get('/', (req, res, next) => {
 router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
 
 // GET USER QUESTION HEAD
-router.get('/next', (req, res, next) => {
-  User.findOne({_id: req.user.id})
-    .then(user => {
-      res.json(user.questions[user.head].question);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
-});
+  
+// router.get('/next', (req, res, next) => {
+//   User.findOne({_id: req.user.id})
+//     .then(user => {
+//       res.json(user.questions[user.head].question);
+//     })
+//     .catch(err => {
+//       console.error(err);
+//       next(err);
+//     });
+// });
 
 // POST ANSWER
 router.post('/answer', (req, res, next) => {

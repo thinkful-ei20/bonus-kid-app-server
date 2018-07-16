@@ -2,11 +2,11 @@
 
 const { Strategy: LocalStrategy } = require('passport-local');
 
-const User = require('../models/user');
+const User = require('../models/parent');
 
 const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
-
+  console.log(username);
   User.find({username})
     .then(results => {
       user = results[0];
