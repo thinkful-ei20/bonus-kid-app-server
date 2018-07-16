@@ -1,0 +1,30 @@
+[
+{
+	"username": "Darren",
+	"password": "password",
+	"isParent": true,
+	"name": "Darren",
+	"email": "darren@gmail.com"
+},
+{
+	"username": "Isael",
+	"password": "password",
+	"isParent": true,
+	"name": "Isael",
+	"email": "Isael@gmail.com"
+},
+{
+	"username": "Tammy",
+	"password": "password",
+	"isParent": true,
+	"name": "Tammy",
+	"email": "Tammy@gmail.com"
+},
+{
+	"username": "SmokingHotPandas",
+	"password": "password",
+	"isParent": true,
+	"name": "Dominick",
+	"email": "dominick@gmail.com"
+}
+]

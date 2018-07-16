@@ -5,7 +5,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
 // DELETE THIS AND GET ENDPOINT LATER
-const User = require('../../models/user');
+const Parent = require('../../models/parent');
 
 const { JWT_SECRET, JWT_EXPIRY } = require('../../config');
 const router = express.Router();

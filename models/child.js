@@ -12,8 +12,7 @@ const childSchema = mongoose.Schema({
   parent: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   task: [
     {
-      type: {type: mongoose.Schema.ObjectId, ref: 'Task', required: true},
-      points: {type: Number, default: 0}
+      id: {type: mongoose.Schema.ObjectId, ref: 'Task', required: true}
     }
   ],
   

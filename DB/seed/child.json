@@ -1,0 +1,24 @@
+[
+  {
+    "username": "kiddo",
+    "password": "password",
+    "name": "kiddo",
+    "parent": "5b4cbdfe1b345c3200056a66",
+    "task": [
+      {
+        "id": "5b4cbdfe1b345c3200056azz"
+      }
+    ]
+  },
+  {
+    "username": "bigkiddo",
+    "password": "password",
+    "name": "bigkiddo",
+    "parent": "5b4cbdfe1b345c3200056a66",
+    "task": [
+      {
+        "id": "5b4cbdfe1b345c3200056z57"
+      }
+    ]
+  }
+]
