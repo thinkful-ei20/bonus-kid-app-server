@@ -224,48 +224,44 @@ router.get('/', (req, res, next) => {
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 //Create Parent Reward
-router.post('/rewards', (req, res, next) => {
-  const { name, points, purchased } = req.body;
-  const { id } = req.user;
+// router.post('/rewards', (req, res, next) => {
+//   const { name, points, purchased } = req.body;
+//   const { id } = req.user;
 
-  Rewards.create({
-    parentId: id,
-    name,
-    points,
-    purchased
-  })
-    .then(reward => {
-      res.json(reward);
-    })
-    .catch(err => {
-      if (err.code === 11000) {
-        let error = new Error('Same name for reward');
-        error.status = 400;
-        next(error);
-      }
-      next(err);
-    });
-});
-
-// GET Parent rewards
-
-router.get('/rewards', (req, res, next) => {
-  const { id } = req.user;
-  console.log(id);
-  Rewards.find({ parentId: id })
-    .then(rewards => {
-      res.json(rewards);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
-});
-
-// POST task
-// router.post('', (req, res, next) => {
-
+//   Rewards.create({
+//     parentId: id,
+//     name,
+//     points,
+//     purchased
+//   })
+//     .then(reward => {
+//       res.json(reward);
+//     })
+//     .catch(err => {
+//       if (err.code === 11000) {
+//         let error = new Error('Same name for reward');
+//         error.status = 400;
+//         next(error);
+//       }
+//       next(err);
+//     });
 // });
+
+// // GET Parent rewards
+
+// router.get('/rewards', (req, res, next) => {
+//   const { id } = req.user;
+//   console.log(id);
+//   Rewards.find({ parentId: id })
+//     .then(rewards => {
+//       res.json(rewards);
+//     })
+//     .catch(err => {
+//       console.error(err);
+//       next(err);
+//     });
+// });
+
 
 /* =================================================================================== */
 // DELETE A USER BY ID
