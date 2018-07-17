@@ -15,7 +15,7 @@ const router = express.Router();
 router.post('/', (req, res, next) => {
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
-  
+
   if (missingField) {
     const err = new Error(`Missing ${missingField} in request body`);
     err.status = 422;
@@ -53,9 +53,9 @@ router.post('/', (req, res, next) => {
   };
 
   const tooSmall = Object.keys(sizedFields).find(field => {
-    'min' in sizedFields[field] 
-    && 
-    req.body[field].trim().length < sizedFields[field].min;
+    'min' in sizedFields[field]
+      &&
+      req.body[field].trim().length < sizedFields[field].min;
   });
   if (tooSmall) {
     const min = sizedFields[tooSmall].min;
@@ -66,9 +66,9 @@ router.post('/', (req, res, next) => {
   }
 
   const tooLarge = Object.keys(sizedFields).find(field => {
-    'max' in sizedFields[field] 
-    &&
-    req.body[field].trim().length > sizedFields[field].max;
+    'max' in sizedFields[field]
+      &&
+      req.body[field].trim().length > sizedFields[field].max;
   });
   if (tooLarge) {
     const max = sizedFields[tooLarge].max;
@@ -80,11 +80,11 @@ router.post('/', (req, res, next) => {
 
   // Create the new user
   let { username, password, name, email, isParent } = req.body;
-  
+
   return User.hashPassword(password)
     .then(digest => {
       const newUser = {
-        username, 
+        username,
         password: digest,
         name,
         email,
@@ -112,7 +112,7 @@ router.post('/', (req, res, next) => {
 router.post('/child', (req, res, next) => {
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
-  
+
   if (missingField) {
     const err = new Error(`Missing ${missingField} in request body`);
     err.status = 422;
@@ -150,9 +150,9 @@ router.post('/child', (req, res, next) => {
   };
 
   const tooSmall = Object.keys(sizedFields).find(field => {
-    'min' in sizedFields[field] 
-    && 
-    req.body[field].trim().length < sizedFields[field].min;
+    'min' in sizedFields[field]
+      &&
+      req.body[field].trim().length < sizedFields[field].min;
   });
   if (tooSmall) {
     const min = sizedFields[tooSmall].min;
@@ -163,9 +163,9 @@ router.post('/child', (req, res, next) => {
   }
 
   const tooLarge = Object.keys(sizedFields).find(field => {
-    'max' in sizedFields[field] 
-    &&
-    req.body[field].trim().length > sizedFields[field].max;
+    'max' in sizedFields[field]
+      &&
+      req.body[field].trim().length > sizedFields[field].max;
   });
   if (tooLarge) {
     const max = sizedFields[tooLarge].max;
@@ -177,11 +177,11 @@ router.post('/child', (req, res, next) => {
 
   // Create the new user
   let { username, password, name, email, parent } = req.body;
-  
+
   return childUser.hashPassword(password)
     .then(digest => {
       const newUser = {
-        username, 
+        username,
         password: digest,
         name,
         email,
@@ -223,13 +223,13 @@ router.get('/', (req, res, next) => {
 
 /* ==================================================================================== */
 // PROTECTION FOR THE FOLLOWING ENDPOINTS
-router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 //Create Parent Reward
 router.post('/rewards', (req, res, next) => {
-  const {name, points, purchased} = req.body;
-  const {id} = req.user;
-  console.log(id, name, points, purchased);
+  const { name, points, purchased } = req.body;
+  const { id } = req.user;
+
   Rewards.create({
     parentId: id,
     name,
@@ -240,31 +240,21 @@ router.post('/rewards', (req, res, next) => {
       res.json(reward);
     })
     .catch(err => {
-      console.log(err.code);
-      if(err.code === 11000){
+      if (err.code === 11000) {
         let error = new Error('Same name for reward');
         error.status = 400;
         next(error);
       }
       next(err);
-    })
-  
-  // User.find({_id: id})
-  //   .then(rewards => {
-  //     res.json(rewards);
-  //   })
-  //   .catch(err => {
-  //     console.error(err);
-  //     next(err);
-  //   });
+    });
 });
 
 // GET Parent rewards
 
 router.get('/rewards', (req, res, next) => {
-  const {id} = req.user;
+  const { id } = req.user;
   console.log(id);
-  Rewards.find({parentId: id})
+  Rewards.find({ parentId: id })
     .then(rewards => {
       res.json(rewards);
     })
@@ -274,70 +264,10 @@ router.get('/rewards', (req, res, next) => {
     });
 });
 
-// POST ANSWER
-router.post('/answer', (req, res, next) => {
-  let { answer, userId } = req.body;
-  let answerToDisplayIfIncorrect = {};
-  let message = '';
+// POST task
+// router.post('', (req, res, next) => {
 
-  User.findById(userId)
-    .then(user => {
-      const answeredIndex = user.head; 
-      const answeredQuestion = user.questions[answeredIndex];
-
-      answerToDisplayIfIncorrect.answer = answeredQuestion.answer;
-
-      if (answer.toLowerCase() === answeredQuestion.answer) {
-        if (user.questions[answeredIndex].m < 9) {
-          user.questions[answeredIndex].m *= 2;
-          message = 'correct';
-          user.counter++;
-        } else {
-          user.questions[answeredIndex].m = 1;
-          message = 'correct';
-          user.counter++;
-        }
-      } else {
-        user.questions[answeredIndex].m = 1; 
-        message = 'incorrect';
-      }
-
-      if (user.head === null) {
-        user.head = 0;
-      } else {
-        user.head = answeredQuestion.next;
-      }
-      
-      // Find insert point
-      let currentQuestion = answeredQuestion;
-      for(let i = 0; i < answeredQuestion.m; i++){
-        if(currentQuestion.next !== null){
-          const nextIndex = currentQuestion.next;
-          currentQuestion = user.questions[nextIndex];
-        } else {
-          const nextIndex = user.head;
-          currentQuestion = user.questions[nextIndex];
-        }
-      }
-
-      // Insert node
-      answeredQuestion.next = currentQuestion.next;
-      currentQuestion.next = answeredIndex;
-      user.save();
-      answerToDisplayIfIncorrect.message = message;
-      
-      if (message === 'correct') {
-        res.json(true);
-      } else if (message === 'incorrect') {
-        answerToDisplayIfIncorrect.boolean = false;
-        res.json(answerToDisplayIfIncorrect);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
-});
+// });
 
 /* =================================================================================== */
 // DELETE A USER BY ID
