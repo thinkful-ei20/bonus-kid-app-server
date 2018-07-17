@@ -47,8 +47,49 @@ router.get('/', (req, res, next) => {
     });
 });
 
+//Update Reward
+
+//update task
+router.put('/:id', (req, res, next) => {
+  const { id } = req.params;
+  let { name, points } = req.body;
+  const updatedTask = {};
+  if (!points && name) {
+
+    updatedTask.name = name;
+  } else if (!name && points) {
+
+    updatedTask.points = points;
+  } else if (!name && !points) {
+
+    let error = new Error('name and points cannot be empty');
+    error.status = 400;
+    next(error);
+  } else {
+
+    updatedTask.name = name;
+    updatedTask.points = points;
+  }
+
+  Rewards.findByIdAndUpdate(id, updatedTask, { new: true })
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+
+
+});
+
+//DELETE Parent Rewards by id
+
 router.delete('/:id', (req, res, next) => {
-  const {id} = req.params;
+  const { id } = req.params;
 
   Rewards.findByIdAndRemove(id)
     .then(() => {
