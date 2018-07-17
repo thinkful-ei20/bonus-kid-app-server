@@ -53,13 +53,13 @@ router.get('/', (req, res, next) => {
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   let { name, points } = req.body;
-  const updatedTask = {};
+  const updatedReward = {};
   if (!points && name) {
 
-    updatedTask.name = name;
+    updatedReward.name = name;
   } else if (!name && points) {
 
-    updatedTask.points = points;
+    updatedReward.points = points;
   } else if (!name && !points) {
 
     let error = new Error('name and points cannot be empty');
@@ -67,11 +67,11 @@ router.put('/:id', (req, res, next) => {
     next(error);
   } else {
 
-    updatedTask.name = name;
-    updatedTask.points = points;
+    updatedReward.name = name;
+    updatedReward.points = points;
   }
 
-  Rewards.findByIdAndUpdate(id, updatedTask, { new: true })
+  Rewards.findByIdAndUpdate(id, updatedReward, { new: true })
     .then(result => {
       if (result) {
         res.json(result);
