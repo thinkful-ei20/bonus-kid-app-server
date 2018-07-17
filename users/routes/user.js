@@ -5,7 +5,7 @@ const passport = require('passport');
 
 const User = require('../../models/parent');
 const childUser = require('../../models/child');
-
+const Rewards = require('../../models/rewards');
 // const questions = require('../../defaultQuestions/index');
 
 const router = express.Router();
@@ -225,18 +225,49 @@ router.get('/', (req, res, next) => {
 // PROTECTION FOR THE FOLLOWING ENDPOINTS
 router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
 
-// GET USER QUESTION HEAD
+//Create Parent Reward
+router.post('/rewards', (req, res, next) => {
+  const {name, points, purchased} = req.body;
+  const {id} = req.user;
+  console.log(id, name, points, purchased);
+  Rewards.create({
+    parentId: id,
+    name,
+    points,
+    purchased
+  })
+    .then(reward => {
+      res.json(reward);
+    })
+    .catch(err => {
+      console.log(err);
+      next(err);
+    })
+  
+  // User.find({_id: id})
+  //   .then(rewards => {
+  //     res.json(rewards);
+  //   })
+  //   .catch(err => {
+  //     console.error(err);
+  //     next(err);
+  //   });
+});
 
-// router.get('/next', (req, res, next) => {
-//   User.findOne({_id: req.user.id})
-//     .then(user => {
-//       res.json(user.questions[user.head].question);
-//     })
-//     .catch(err => {
-//       console.error(err);
-//       next(err);
-//     });
-// });
+// GET Parent rewards
+
+router.get('/rewards', (req, res, next) => {
+  const {id} = req.user;
+  console.log(id);
+  Rewards.find({parentId: id})
+    .then(rewards => {
+      res.json(rewards);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
 
 // POST ANSWER
 router.post('/answer', (req, res, next) => {
