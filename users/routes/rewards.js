@@ -48,8 +48,6 @@ router.get('/', (req, res, next) => {
 });
 
 //Update Reward
-
-//update task
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   let { name, points } = req.body;
