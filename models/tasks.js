@@ -13,8 +13,7 @@ const tasksSchema = mongoose.Schema({
     }
   ],
   complete: {type: Boolean, default: false},
-
-  
+  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true}  
 
 }, {timestamps: true});
 
