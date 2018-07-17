@@ -240,7 +240,12 @@ router.post('/rewards', (req, res, next) => {
       res.json(reward);
     })
     .catch(err => {
-      console.log(err);
+      console.log(err.code);
+      if(err.code === 11000){
+        let error = new Error('Same name for reward');
+        error.status = 400;
+        next(error);
+      }
       next(err);
     })
   
