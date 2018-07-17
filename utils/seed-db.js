@@ -14,25 +14,17 @@ const seedParent = require('../DB/seed/parent');
 const seedChild = require('../DB/seed/child');
 const seedTasks = require('../DB/seed/tasks');
 const seedRewards = require('../DB/seed/rewards');
-
+let ids = [];
 mongoose.connect(DATABASE_URL)
   .then(() => {
     mongoose.connection.db.dropDatabase();
     console.log(DATABASE_URL);
   })
   .then(() => {
-    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)));
+    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)))
   })
   .then(digests => {
-    let ids = [];
-    seedParent.forEach((user, i) => {
-      console.log("user: ", user);
-      
-      user.password = digests[i];
-      ids.push(user.id);
-    });
-    console.log(ids);
-    
+    seedParent.forEach((user, i) => user.password = digests[i]);
     return Promise.all([
       Child.insertMany(seedChild),
       Child.createIndexes(),
@@ -40,13 +32,20 @@ mongoose.connect(DATABASE_URL)
       Parent.insertMany(seedParent),
       Parent.createIndexes(),
 
-      Tasks.insertMany(seedTasks),
-      Tasks.createIndexes(),
-
       Rewards.insertMany(seedRewards),
       Rewards.createIndexes()
       
     ]);
+  })
+  .then(([result1,result2,result3,result4,result5]) => {
+    result3.forEach((user, i) => ids.push(user.id));
+    console.log(ids);
+    seedTasks.forEach((task,i) => task.parentId = ids[i]);
+    console.log(seedTasks);
+    return Promise.all([
+      Tasks.insertMany(seedTasks),
+      Tasks.createIndexes(),
+    ])
   })
   .then(() => mongoose.disconnect())
   .catch(err => {
