@@ -6,7 +6,7 @@
     "child": [
       {"id": "5b4d0890a6b4fb75280719a9"}
     ],
-    "parentId": "5b4e03983849bc2e4b21588c"
+    "parentId": null
   },
   {
     "name": "homework",
@@ -15,7 +15,7 @@
     "child": [
       {"id": "5b4d0890a6b4fb75280719a9"}
     ],
-    "parentId": "5b4e03983849bc2e4b21588c"
+    "parentId": null
   },
   {
     "name": "A on a test",
@@ -24,6 +24,15 @@
     "child": [
       {"id": "5b4d0890a6b4fb75280719a9"}
     ],
-    "parentId": "5b4e03983849bc2e4b21588c"
+    "parentId": null
+  },
+  {
+    "name": "ya did gud, kid",
+    "pointValue": 25,
+    "complete": false,
+    "child": [
+      {"id": "5b4d0890a6b4fb75280719a9"}
+    ],
+    "parentId": null
   }
 ]

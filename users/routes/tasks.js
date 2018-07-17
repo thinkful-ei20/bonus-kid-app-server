@@ -12,7 +12,10 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 //get all tasks
 router.get('/', (req,res,next) => {
-  Tasks.find()
+
+  const userId = req.user.id;
+
+  Tasks.find({parentId:userId})
     .sort({ 'updatedAt': 'desc' })
     .then(results => {
       res.json(results);
@@ -22,11 +25,13 @@ router.get('/', (req,res,next) => {
     });
 });
 
-
 //create task
 
 router.post('/', (req , res, next) => {
   const requiredFields = [ 'name', 'pointValue'];
+
+  const userId = req.user.id;
+
   const missingField = requiredFields.find(field => !(field in req.body));
   
   if (missingField) {
@@ -50,12 +55,16 @@ router.post('/', (req , res, next) => {
 
   //create new task
   let { name, pointValue} = req.body;
-  const newTask = { name, pointValue };
+  const newTask = { 
+    name, 
+    pointValue, 
+    parentId : userId 
+  };
 
   return Tasks.create(newTask)
     .then(result => {
       return res.status(201)
-        .location(`/api/tasks/${result.id}`)
+        .location(`${req.originalUrl}/${result.id}`)
         .json(result);
     })
     .catch(err => {
@@ -66,10 +75,37 @@ router.post('/', (req , res, next) => {
 //update task
 router.put('/:id', (req,res,next) => {
   const { id }= req.params;
-  let { name, pointValue} = req.body;
-  const updatedTask = { name, pointValue};
+  const { name, pointValue} = req.body;
+  const userId = req.user.id;
 
-  Tasks.findByIdAndUpdate( id, updatedTask, { new: true } )
+  const updatedTask = { name, pointValue, userId };
+
+  // Tasks.findOne({_id:id})
+  //   .then((res) => {
+  //     console.log('res.parentID',typeof res.parentId);
+  //     console.log('userId',typeof userId);
+
+  //     if(res.parentId == userId){
+        
+  //       Tasks.findOneAndUpdate( id, updatedTask )
+  //         .then(result => {
+  //           if (result) {
+  //             res.json(result);
+  //           } else {
+  //             next();
+  //           }
+  //         })
+  //         .catch(err => {
+  //           next(err);
+  //         });
+  //     } else {
+  //       console.log('rehjected');
+        
+  //       Promise.reject(new Error('you don\'t own this task')).then(res, next);
+  //     }
+  //   });
+
+  Tasks.findOneAndUpdate( {_id:id, parentId:userId }, updatedTask, { new: true } )
     .then(result => {
       if (result) {
         res.json(result);
@@ -86,8 +122,9 @@ router.put('/:id', (req,res,next) => {
 //delete task
 router.delete('/:id', (req,res,next) => {
   const { id }= req.params;
+  const userId = req.user.id;
 
-  Tasks.findByIdAndRemove({_id:id })
+  Tasks.findOneAndRemove({_id:id, parentId:userId })
     .then(() => {
       res.status(204).end();
     })

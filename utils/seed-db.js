@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { DATABASE_URL } = require('../config');
 
 const Parent = require('../models/parent');
-const Child = require('../models/child')
+const Child = require('../models/child');
 const Tasks = require('../models/tasks');
 const Rewards = require('../models/rewards');
 
@@ -21,7 +21,7 @@ mongoose.connect(DATABASE_URL)
     console.log(DATABASE_URL);
   })
   .then(() => {
-    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)))
+    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)));
   })
   .then(digests => {
     seedParent.forEach((user, i) => user.password = digests[i]);
@@ -45,7 +45,7 @@ mongoose.connect(DATABASE_URL)
     return Promise.all([
       Tasks.insertMany(seedTasks),
       Tasks.createIndexes(),
-    ])
+    ]);
   })
   .then(() => mongoose.disconnect())
   .catch(err => {
