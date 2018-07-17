@@ -71,13 +71,9 @@ router.put('/:id', (req, res, next) => {
     updatedReward.points = points;
   }
 
-  Rewards.findByIdAndUpdate(id, updatedReward, { new: true })
+  Rewards.findByIdAndUpdate({_id: id, parentId: req.user.id}, updatedReward, { new: true })
     .then(result => {
-      if (result) {
         res.json(result);
-      } else {
-        next();
-      }
     })
     .catch(err => {
       next(err);
