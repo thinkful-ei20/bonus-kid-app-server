@@ -6,7 +6,6 @@ const passport = require('passport');
 const User = require('../../models/parent');
 const childUser = require('../../models/child');
 const Rewards = require('../../models/rewards');
-// const questions = require('../../defaultQuestions/index');
 
 const router = express.Router();
 
@@ -108,7 +107,6 @@ router.post('/', (req, res, next) => {
 });
 
 // CREATE NEW CHILD USER
-
 router.post('/child', (req, res, next) => {
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
@@ -209,7 +207,7 @@ router.post('/child', (req, res, next) => {
 
 
 /* =================================================================================== */
-// GET ALL USERS
+// GET ALL USERS testing purposes only remove after
 router.get('/', (req, res, next) => {
   User.find()
     .then(user => {
