@@ -90,17 +90,13 @@ router.put('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
-
-  Rewards.findByIdAndRemove(id)
+  Rewards.deleteOne({_id: id, parentId: req.user.id})
     .then(() => {
       res.status(204).end();
     })
     .catch(error => {
       next(error);
     });
-
-
-
 });
 
 module.exports = router;
