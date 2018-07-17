@@ -88,7 +88,7 @@ router.post('/', (req, res, next) => {
         password: digest,
         name,
         email,
-        isParent
+        // isParent
       };
       return User.create(newUser);
     })
@@ -226,7 +226,7 @@ router.get('/', (req, res, next) => {
 router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
 
 // GET USER QUESTION HEAD
-  
+
 // router.get('/next', (req, res, next) => {
 //   User.findOne({_id: req.user.id})
 //     .then(user => {
