@@ -9,12 +9,11 @@ const tasksSchema = mongoose.Schema({
   pointValue: {type: Number, required: true},
   child: [
     {
-      id: {type: mongoose.Schema.ObjectId, ref: 'Child', required: true}
+      id: {type: mongoose.Schema.ObjectId, ref: 'Child'}
     }
   ],
-  complete: {type: Boolean, required: true},
-
-  
+  complete: {type: Boolean, default: false},
+  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true}  
 
 }, {timestamps: true});
 
