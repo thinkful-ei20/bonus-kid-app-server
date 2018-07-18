@@ -13,7 +13,9 @@ const tasksSchema = mongoose.Schema({
     }
   ],
   complete: {type: Boolean, default: false},
-  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true}  
+  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
+  expiryDate: {type: String, require:true, default: ''},
+  currentTime: {type: String, require: true, default: ''} 
 
 }, {timestamps: true});
 
