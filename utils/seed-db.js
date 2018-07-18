@@ -27,21 +27,22 @@ mongoose.connect(DATABASE_URL)
   .then(digests => {
     seedParent.forEach((user, i) => user.password = digests[i]);
     return Promise.all([
-      Child.insertMany(seedChild),
-      Child.createIndexes(),
 
       Parent.insertMany(seedParent),
       Parent.createIndexes(),
       
     ]);
   })
-  .then(([result1,result2,result3,result4]) => {
-    result3.forEach((user, i) => ids.push(user.id));
+  .then(([result1]) => {
+    result1.forEach((user, i) => ids.push(user.id));
     // result5.forEach((reward,i) => rewardIds.push(reward.id))
     // console.log(ids);
     seedTasks.forEach((task,i) => task.parentId = ids[i]);
     seedRewards.forEach((reward,i) => reward.parentId = ids[i]);
+    seedChild.forEach((reward,i) => reward.parentId = ids[i]);
     return Promise.all([
+      Child.insertMany(seedChild),
+      Child.createIndexes(),
       Tasks.insertMany(seedTasks),
       Tasks.createIndexes(),
       Rewards.insertMany(seedRewards),
