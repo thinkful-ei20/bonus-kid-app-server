@@ -12,15 +12,17 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 //Create Parent Reward
 router.post('/', (req, res, next) => {
-  const { name, points, purchased , day, hour} = req.body;
+  let { name, points, purchased , day, hour} = req.body;
   const { id } = req.user;
+  if(!day) day = 0;
+  if(!hour) hour = 0;
   Rewards.create({
     parentId: id,
     name,
     points,
     purchased,
-    currentTime: moment(),
-    expiryDate: moment().add(day,'days').add(hour,'hours')
+    currentTime: moment().valueOf(),
+    expiryDate: moment().add(day,'days').add(hour,'hours').valueOf()
   })
     .then(reward => {
       res.json(reward);
@@ -52,34 +54,42 @@ router.get('/', (req, res, next) => {
 //Update Reward
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
-  let { name, points } = req.body;
+  let { name, points, hour, day } = req.body;
+  hour = parseInt(hour);
+  day = parseInt(day);
   const updatedReward = {};
-  if (!points && name) {
 
+  if(name){
     updatedReward.name = name;
-  } else if (!name && points) {
-
-    updatedReward.points = points;
-  } else if (!name && !points) {
-
-    let error = new Error('name and points cannot be empty');
-    error.status = 400;
-    next(error);
-  } else {
-
-    updatedReward.name = name;
-    updatedReward.points = points;
   }
-
-  Rewards.findByIdAndUpdate({_id: id, parentId: req.user.id}, updatedReward, { new: true })
+  if (points){
+    updatedReward.points = points;
+  } 
+  if (hour > 0 || day > 0){
+    console.log('this ran');
+    updatedReward.expiryDate = moment().add(day,'days').add(hour,'hours').valueOf();
+  }
+  if (hour === 0 && day === 0){
+    Rewards.findById(id)
+      .then(result => updatedReward.expiryDate = result.currentTime)
+      .then(() => {
+        return Rewards.findByIdAndUpdate({_id: id, parentId: req.user.id}, updatedReward, { new: true })
+          .then(result => {
+              res.json(result);
+          })
+          .catch(err => {
+            next(err);
+          });
+      });     
+  } else {
+    Rewards.findByIdAndUpdate({_id: id, parentId: req.user.id}, updatedReward, { new: true })
     .then(result => {
         res.json(result);
     })
     .catch(err => {
       next(err);
     });
-
-
+  }
 });
 
 //DELETE Parent Rewards by id
