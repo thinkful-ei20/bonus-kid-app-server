@@ -9,7 +9,9 @@ const rewardsSchema = mongoose.Schema({
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   name: {type: String, required: true},
   points: {type: Number, required: true},
-  purchased: {type: Boolean, required: true, default: false}
+  purchased: {type: Boolean, required: true, default: false},
+  expiryDate: {type: String, require:true, default: ''},
+  currentTime: {type: String, require: true, default: ''}
 });
 
 rewardsSchema.index({name: 1, parentId: 1}, {unique: true});

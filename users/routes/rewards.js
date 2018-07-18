@@ -2,6 +2,7 @@
 
 const express = require('express');
 
+const moment = require('moment');
 const router = express.Router();
 const passport = require('passport');
 
@@ -11,14 +12,15 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 //Create Parent Reward
 router.post('/', (req, res, next) => {
-  const { name, points, purchased } = req.body;
+  const { name, points, purchased , day, hour} = req.body;
   const { id } = req.user;
-
   Rewards.create({
     parentId: id,
     name,
     points,
-    purchased
+    purchased,
+    currentTime: moment(),
+    expiryDate: moment().add(day,'days').add(hour,'hours')
   })
     .then(reward => {
       res.json(reward);
