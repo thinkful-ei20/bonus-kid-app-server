@@ -3,10 +3,9 @@
 const express = require('express');
 const passport = require('passport');
 
-const User = require('../../models/parent');
-const childUser = require('../../models/child');
+const Parent = require('../models/parent');
+const childUser = require('../models/child');
 
-// const questions = require('../../defaultQuestions/index');
 
 const router = express.Router();
 
@@ -81,16 +80,16 @@ router.post('/', (req, res, next) => {
   // Create the new user
   let { username, password, name, email, isParent } = req.body;
   
-  return User.hashPassword(password)
+  return Parent.hashPassword(password)
     .then(digest => {
       const newUser = {
         username, 
         password: digest,
         name,
         email,
-        // isParent
+        isParent: true
       };
-      return User.create(newUser);
+      return Parent.create(newUser);
     })
     .then(result => {
       return res.status(201)
@@ -211,7 +210,7 @@ router.post('/child', (req, res, next) => {
 /* =================================================================================== */
 // GET ALL USERS
 router.get('/', (req, res, next) => {
-  User.find()
+  Parent.find()
     .then(user => {
       res.json(user);
     })
@@ -228,7 +227,7 @@ router.use('/', passport.authenticate('jwt', {session: false, failWithError: tru
 // GET USER QUESTION HEAD
 
 // router.get('/next', (req, res, next) => {
-//   User.findOne({_id: req.user.id})
+//   Parent.findOne({_id: req.user.id})
 //     .then(user => {
 //       res.json(user.questions[user.head].question);
 //     })
@@ -244,7 +243,7 @@ router.post('/answer', (req, res, next) => {
   let answerToDisplayIfIncorrect = {};
   let message = '';
 
-  User.findById(userId)
+  Parent.findById(userId)
     .then(user => {
       const answeredIndex = user.head; 
       const answeredQuestion = user.questions[answeredIndex];
@@ -308,7 +307,7 @@ router.post('/answer', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
-  User.findOneAndRemove({ _id: id })
+  Parent.findOneAndRemove({ _id: id })
     .then(() => {
       res.json({
         message: 'Deleted user'

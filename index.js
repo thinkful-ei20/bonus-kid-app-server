@@ -13,9 +13,11 @@ const { PORT, CLIENT_ORIGIN } = require('./config');
 const { dbConnect } = require('./db-mongoose');
 
 // ROUTERS
-const userRouter = require('./users/routes/user');
-const authRouter = require('./users/routes/auth');
-const tasksRouter = require('./users/routes/tasks');
+const parentRouter = require('./routes/parent');
+// const childRouter = require('./routes/child');
+
+const authRouter = require('./routes/auth');
+const tasksRouter = require('./routes/tasks');
 
 // Express app
 const app = express();
@@ -43,7 +45,8 @@ passport.use(jwtStrategy);
 
 // Endpoints
 app.use('/api', authRouter);
-app.use('/api/users', userRouter);
+app.use('/api/parent', parentRouter);
+// app.use('/api/child', childRouter);
 app.use('/api/tasks', tasksRouter);
 
 // Catch-all 404

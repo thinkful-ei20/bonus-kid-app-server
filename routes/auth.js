@@ -5,9 +5,9 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
 // DELETE THIS AND GET ENDPOINT LATER
-const Parent = require('../../models/parent');
+const Parent = require('../models/parent');
 
-const { JWT_SECRET, JWT_EXPIRY } = require('../../config');
+const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 const router = express.Router();
 
 const localAuth = passport.authenticate('local', { session: false, failWithError: true });
