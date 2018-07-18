@@ -22,15 +22,20 @@ mongoose.connect(DATABASE_URL)
     console.log(DATABASE_URL);
   })
   .then(() => {
-    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)));
-  })
-  .then(digests => {
-    seedParent.forEach((user, i) => user.password = digests[i]);
     return Promise.all([
+      Promise.all(seedParent.map(user => Parent.hashPassword(user.password))),
+      Promise.all(seedChild.map(kid => Child.hashPassword(kid.password)))
+    ]);
+  })
+  .then((results) => {    
+    console.log("kids digest",results);
+    
+    seedParent.forEach((user, i) => {user.password = results[0][i]});
+    seedChild.forEach((kid, i) => kid.password = results[1][i]);
 
+    return Promise.all([
       Parent.insertMany(seedParent),
-      Parent.createIndexes(),
-      
+      Parent.createIndexes(),      
     ]);
   })
   .then(([result1]) => {

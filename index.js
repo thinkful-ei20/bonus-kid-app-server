@@ -8,13 +8,15 @@ const morgan = require('morgan');
 const passport = require('passport');
 
 const localStrategy = require('./auth/local');
+const localChildStrategy = require('./auth/local-child');
+
 const jwtStrategy = require('./auth/jwt');
 const { PORT, CLIENT_ORIGIN } = require('./config');
 const { dbConnect } = require('./db-mongoose');
 
 // ROUTERS
 const parentRouter = require('./routes/parent');
-// const childRouter = require('./routes/child');
+const childRouter = require('./routes/child');
 
 const authRouter = require('./routes/auth');
 const tasksRouter = require('./routes/tasks');
@@ -40,13 +42,14 @@ app.use(
 app.use(express.json());
 
 // Auth
-passport.use(localStrategy);
+passport.use('localParent', localStrategy);
+passport.use('localChild',localChildStrategy);
 passport.use(jwtStrategy);
 
 // Endpoints
 app.use('/api', authRouter);
 app.use('/api/parent', parentRouter);
-// app.use('/api/child', childRouter);
+app.use('/api/child', childRouter);
 app.use('/api/tasks', tasksRouter);
 
 // Catch-all 404

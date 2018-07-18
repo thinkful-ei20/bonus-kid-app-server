@@ -4,7 +4,7 @@ const express = require('express');
 const passport = require('passport');
 
 const Parent = require('../models/parent');
-const childUser = require('../models/child');
+const Child = require('../models/child');
 
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 /* =================================================================================== */
 // CREATE NEW PARENT USER
 router.post('/', (req, res, next) => {
-  const requiredFields = ['username', 'password'];
+  const requiredFields = ['username', 'password', 'email'];
   const missingField = requiredFields.find(field => !(field in req.body));
   
   if (missingField) {
@@ -106,6 +106,25 @@ router.post('/', (req, res, next) => {
     });
 });
 
+/* =================================================================================== */
+// GET ALL USERS
+router.get('/', (req, res, next) => {
+  Parent.find()
+    .then(user => {
+      res.json(user);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
+
+/* ==================================================================================== */
+// PROTECTION FOR THE FOLLOWING ENDPOINTS
+router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
+
+/* =================================================================================== */
+
 // CREATE NEW CHILD USER
 
 router.post('/child', (req, res, next) => {
@@ -175,9 +194,10 @@ router.post('/child', (req, res, next) => {
   }
 
   // Create the new user
-  let { username, password, name, email, parent } = req.body;
+  const { username, password, name, email } = req.body;
+  const userId = req.user.id
   
-  return childUser.hashPassword(password)
+  return Child.hashPassword(password)
     .then(digest => {
       const newUser = {
         username, 
@@ -185,9 +205,9 @@ router.post('/child', (req, res, next) => {
         name,
         email,
         isParent: false,
-        parent
+        parentId: userId        
       };
-      return childUser.create(newUser);
+      return Child.create(newUser);
     })
     .then(result => {
       return res.status(201)
@@ -204,113 +224,32 @@ router.post('/child', (req, res, next) => {
     });
 });
 
-
-
-
 /* =================================================================================== */
-// GET ALL USERS
-router.get('/', (req, res, next) => {
-  Parent.find()
-    .then(user => {
-      res.json(user);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
-});
-
-/* ==================================================================================== */
-// PROTECTION FOR THE FOLLOWING ENDPOINTS
-router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
-
-// GET USER QUESTION HEAD
-
-// router.get('/next', (req, res, next) => {
-//   Parent.findOne({_id: req.user.id})
-//     .then(user => {
-//       res.json(user.questions[user.head].question);
-//     })
-//     .catch(err => {
-//       console.error(err);
-//       next(err);
-//     });
-// });
-
-// POST ANSWER
-router.post('/answer', (req, res, next) => {
-  let { answer, userId } = req.body;
-  let answerToDisplayIfIncorrect = {};
-  let message = '';
-
-  Parent.findById(userId)
-    .then(user => {
-      const answeredIndex = user.head; 
-      const answeredQuestion = user.questions[answeredIndex];
-
-      answerToDisplayIfIncorrect.answer = answeredQuestion.answer;
-
-      if (answer.toLowerCase() === answeredQuestion.answer) {
-        if (user.questions[answeredIndex].m < 9) {
-          user.questions[answeredIndex].m *= 2;
-          message = 'correct';
-          user.counter++;
-        } else {
-          user.questions[answeredIndex].m = 1;
-          message = 'correct';
-          user.counter++;
-        }
-      } else {
-        user.questions[answeredIndex].m = 1; 
-        message = 'incorrect';
-      }
-
-      if (user.head === null) {
-        user.head = 0;
-      } else {
-        user.head = answeredQuestion.next;
-      }
-      
-      // Find insert point
-      let currentQuestion = answeredQuestion;
-      for(let i = 0; i < answeredQuestion.m; i++){
-        if(currentQuestion.next !== null){
-          const nextIndex = currentQuestion.next;
-          currentQuestion = user.questions[nextIndex];
-        } else {
-          const nextIndex = user.head;
-          currentQuestion = user.questions[nextIndex];
-        }
-      }
-
-      // Insert node
-      answeredQuestion.next = currentQuestion.next;
-      currentQuestion.next = answeredIndex;
-      user.save();
-      answerToDisplayIfIncorrect.message = message;
-      
-      if (message === 'correct') {
-        res.json(true);
-      } else if (message === 'incorrect') {
-        answerToDisplayIfIncorrect.boolean = false;
-        res.json(answerToDisplayIfIncorrect);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
-});
-
-/* =================================================================================== */
-// DELETE A USER BY ID
+// DELETE A PARENT BY ID
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
   Parent.findOneAndRemove({ _id: id })
     .then(() => {
       res.json({
-        message: 'Deleted user'
+        message: 'Deleted parent user'
+      });
+      res.status(204).end();
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
+
+// DELETE A CHILD BY ID
+router.delete('/child/:id', (req, res, next) => {
+  const { id } = req.params;
+
+  Child.findOneAndRemove({ _id: id })
+    .then(() => {
+      res.json({
+        message: 'Deleted child user'
       });
       res.status(204).end();
     })
