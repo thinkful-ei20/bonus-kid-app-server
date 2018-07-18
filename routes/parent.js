@@ -3,9 +3,8 @@
 const express = require('express');
 const passport = require('passport');
 
-const User = require('../../models/parent');
-const childUser = require('../../models/child');
-const Rewards = require('../../models/rewards');
+const Parent = require('../models/parent');
+const Child = require('../models/child');
 
 const router = express.Router();
 
@@ -79,13 +78,8 @@ router.post('/', (req, res, next) => {
 
   // Create the new user
   let { username, password, name, email, isParent } = req.body;
-<<<<<<< HEAD:users/routes/user.js
-
-  return User.hashPassword(password)
-=======
   
   return Parent.hashPassword(password)
->>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     .then(digest => {
       const newUser = {
         username,
@@ -198,16 +192,10 @@ router.post('/child', (req, res, next) => {
   }
 
   // Create the new user
-<<<<<<< HEAD:users/routes/user.js
-  let { username, password, name, email, parent } = req.body;
-
-  return childUser.hashPassword(password)
-=======
   const { username, password, name, email } = req.body;
   const userId = req.user.id
   
   return Child.hashPassword(password)
->>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     .then(digest => {
       const newUser = {
         username,

@@ -15,10 +15,11 @@ const { PORT, CLIENT_ORIGIN } = require('./config');
 const { dbConnect } = require('./db-mongoose');
 
 // ROUTERS
-const authRouter = require('./users/routes/auth');
-const tasksRouter = require('./users/routes/tasks');
-const rewardsRouter = require('./users/routes/rewards');
-
+const authRouter = require('./routes/auth');
+const tasksRouter = require('./routes/tasks');
+const rewardsRouter = require('./routes/rewards');
+const parentRouter = require('./routes/parent');
+const childRouter = require('./routes/child');
 // Express app
 const app = express();
 

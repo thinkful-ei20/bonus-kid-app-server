@@ -6,7 +6,7 @@ const moment = require('moment');
 const router = express.Router();
 const passport = require('passport');
 
-const Rewards = require('../../models/rewards');
+const Rewards = require('../models/rewards');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
