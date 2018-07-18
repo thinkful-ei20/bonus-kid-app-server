@@ -9,7 +9,7 @@ const childSchema = mongoose.Schema({
   username: {type: String, required: true, unique: true},
   email: {type: String},
   password: {type: String, required: true},
-  parent: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
+  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   totalPoints: {type: Number, required: true, default: 0},
   currentPoints: {type: Number, required:true, default: 0},
   tasks: [

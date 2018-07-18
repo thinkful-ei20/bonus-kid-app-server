@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-const Tasks = require ('../../models/tasks');
+const Tasks = require ('../models/tasks');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true}));
 

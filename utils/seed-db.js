@@ -22,26 +22,32 @@ mongoose.connect(DATABASE_URL)
     console.log(DATABASE_URL);
   })
   .then(() => {
-    return Promise.all(seedParent.map(user => Parent.hashPassword(user.password)));
-  })
-  .then(digests => {
-    seedParent.forEach((user, i) => user.password = digests[i]);
     return Promise.all([
-      Child.insertMany(seedChild),
-      Child.createIndexes(),
-
-      Parent.insertMany(seedParent),
-      Parent.createIndexes(),
-      
+      Promise.all(seedParent.map(user => Parent.hashPassword(user.password))),
+      Promise.all(seedChild.map(kid => Child.hashPassword(kid.password)))
     ]);
   })
-  .then(([result1,result2,result3,result4]) => {
-    result3.forEach((user, i) => ids.push(user.id));
+  .then((results) => {    
+    console.log("kids digest",results);
+    
+    seedParent.forEach((user, i) => {user.password = results[0][i]});
+    seedChild.forEach((kid, i) => kid.password = results[1][i]);
+
+    return Promise.all([
+      Parent.insertMany(seedParent),
+      Parent.createIndexes(),      
+    ]);
+  })
+  .then(([result1]) => {
+    result1.forEach((user, i) => ids.push(user.id));
     // result5.forEach((reward,i) => rewardIds.push(reward.id))
     // console.log(ids);
     seedTasks.forEach((task,i) => task.parentId = ids[i]);
     seedRewards.forEach((reward,i) => reward.parentId = ids[i]);
+    seedChild.forEach((reward,i) => reward.parentId = ids[i]);
     return Promise.all([
+      Child.insertMany(seedChild),
+      Child.createIndexes(),
       Tasks.insertMany(seedTasks),
       Tasks.createIndexes(),
       Rewards.insertMany(seedRewards),

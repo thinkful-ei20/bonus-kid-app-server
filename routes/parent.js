@@ -3,16 +3,22 @@
 const express = require('express');
 const passport = require('passport');
 
+<<<<<<< HEAD:users/routes/user.js
 const User = require('../../models/parent');
 const childUser = require('../../models/child');
 const Rewards = require('../../models/rewards');
+=======
+const Parent = require('../models/parent');
+const Child = require('../models/child');
+
+>>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
 
 const router = express.Router();
 
 /* =================================================================================== */
 // CREATE NEW PARENT USER
 router.post('/', (req, res, next) => {
-  const requiredFields = ['username', 'password'];
+  const requiredFields = ['username', 'password', 'email'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -79,17 +85,22 @@ router.post('/', (req, res, next) => {
 
   // Create the new user
   let { username, password, name, email, isParent } = req.body;
+<<<<<<< HEAD:users/routes/user.js
 
   return User.hashPassword(password)
+=======
+  
+  return Parent.hashPassword(password)
+>>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     .then(digest => {
       const newUser = {
         username,
         password: digest,
         name,
         email,
-        // isParent
+        isParent: true
       };
-      return User.create(newUser);
+      return Parent.create(newUser);
     })
     .then(result => {
       return res.status(201)
@@ -105,6 +116,25 @@ router.post('/', (req, res, next) => {
       next(err);
     });
 });
+
+/* =================================================================================== */
+// GET ALL USERS
+router.get('/', (req, res, next) => {
+  Parent.find()
+    .then(user => {
+      res.json(user);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
+
+/* ==================================================================================== */
+// PROTECTION FOR THE FOLLOWING ENDPOINTS
+router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
+
+/* =================================================================================== */
 
 // CREATE NEW CHILD USER
 router.post('/child', (req, res, next) => {
@@ -174,9 +204,16 @@ router.post('/child', (req, res, next) => {
   }
 
   // Create the new user
+<<<<<<< HEAD:users/routes/user.js
   let { username, password, name, email, parent } = req.body;
 
   return childUser.hashPassword(password)
+=======
+  const { username, password, name, email } = req.body;
+  const userId = req.user.id
+  
+  return Child.hashPassword(password)
+>>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     .then(digest => {
       const newUser = {
         username,
@@ -184,9 +221,9 @@ router.post('/child', (req, res, next) => {
         name,
         email,
         isParent: false,
-        parent
+        parentId: userId        
       };
-      return childUser.create(newUser);
+      return Child.create(newUser);
     })
     .then(result => {
       return res.status(201)
@@ -203,21 +240,32 @@ router.post('/child', (req, res, next) => {
     });
 });
 
-
-
-
 /* =================================================================================== */
+<<<<<<< HEAD:users/routes/user.js
 // GET ALL USERS testing purposes only remove after
 router.get('/', (req, res, next) => {
   User.find()
     .then(user => {
       res.json(user);
+=======
+// DELETE A PARENT BY ID
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+
+  Parent.findOneAndRemove({ _id: id })
+    .then(() => {
+      res.json({
+        message: 'Deleted parent user'
+      });
+      res.status(204).end();
+>>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     })
     .catch(err => {
       console.error(err);
       next(err);
     });
 });
+<<<<<<< HEAD:users/routes/user.js
 
 /* ==================================================================================== */
 // PROTECTION FOR THE FOLLOWING ENDPOINTS
@@ -262,16 +310,17 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 //     });
 // });
 
+=======
+>>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
 
-/* =================================================================================== */
-// DELETE A USER BY ID
-router.delete('/:id', (req, res, next) => {
+// DELETE A CHILD BY ID
+router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
 
-  User.findOneAndRemove({ _id: id })
+  Child.findOneAndRemove({ _id: id })
     .then(() => {
       res.json({
-        message: 'Deleted user'
+        message: 'Deleted child user'
       });
       res.status(204).end();
     })
