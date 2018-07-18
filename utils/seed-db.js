@@ -44,7 +44,7 @@ mongoose.connect(DATABASE_URL)
     // console.log(ids);
     seedTasks.forEach((task,i) => task.parentId = ids[i]);
     seedRewards.forEach((reward,i) => reward.parentId = ids[i]);
-    seedChild.forEach((reward,i) => reward.parentId = ids[i]);
+    seedChild.forEach((kid,i) => kid.parentId = ids[i]);
     return Promise.all([
       Child.insertMany(seedChild),
       Child.createIndexes(),
