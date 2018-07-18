@@ -3,15 +3,9 @@
 const express = require('express');
 const passport = require('passport');
 
-<<<<<<< HEAD:users/routes/user.js
 const User = require('../../models/parent');
 const childUser = require('../../models/child');
 const Rewards = require('../../models/rewards');
-=======
-const Parent = require('../models/parent');
-const Child = require('../models/child');
-
->>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
 
 const router = express.Router();
 
@@ -241,14 +235,7 @@ router.post('/child', (req, res, next) => {
 });
 
 /* =================================================================================== */
-<<<<<<< HEAD:users/routes/user.js
-// GET ALL USERS testing purposes only remove after
-router.get('/', (req, res, next) => {
-  User.find()
-    .then(user => {
-      res.json(user);
-=======
-// DELETE A PARENT BY ID
+// DELETE A PARENT BY IDS
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
 
@@ -258,60 +245,12 @@ router.delete('/:id', (req, res, next) => {
         message: 'Deleted parent user'
       });
       res.status(204).end();
->>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
     })
     .catch(err => {
       console.error(err);
       next(err);
     });
 });
-<<<<<<< HEAD:users/routes/user.js
-
-/* ==================================================================================== */
-// PROTECTION FOR THE FOLLOWING ENDPOINTS
-router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
-
-//Create Parent Reward
-// router.post('/rewards', (req, res, next) => {
-//   const { name, points, purchased } = req.body;
-//   const { id } = req.user;
-
-//   Rewards.create({
-//     parentId: id,
-//     name,
-//     points,
-//     purchased
-//   })
-//     .then(reward => {
-//       res.json(reward);
-//     })
-//     .catch(err => {
-//       if (err.code === 11000) {
-//         let error = new Error('Same name for reward');
-//         error.status = 400;
-//         next(error);
-//       }
-//       next(err);
-//     });
-// });
-
-// // GET Parent rewards
-
-// router.get('/rewards', (req, res, next) => {
-//   const { id } = req.user;
-//   console.log(id);
-//   Rewards.find({ parentId: id })
-//     .then(rewards => {
-//       res.json(rewards);
-//     })
-//     .catch(err => {
-//       console.error(err);
-//       next(err);
-//     });
-// });
-
-=======
->>>>>>> 5b277438dd08eab07cb788e55e97132e87aa2ba4:routes/parent.js
 
 // DELETE A CHILD BY ID
 router.delete('/child/:id', (req, res, next) => {
