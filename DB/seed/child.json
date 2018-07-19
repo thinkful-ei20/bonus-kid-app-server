@@ -4,9 +4,7 @@
     "password": "password",
     "name": "kiddo",
     "tasks": [
-      {
-        "id": "5b4d0a9ff15077770d9ea462"
-      }
+      
     ],
     "totalPoints": 0,
     "currentPoints": 0
@@ -15,11 +13,7 @@
     "username": "bigkiddo",
     "password": "password",
     "name": "bigkiddo",
-    "tasks": [
-      {
-        "id": "5b4d0a9ff15077770d9ea462"
-      }
-    ],
+    "tasks": [],
     "totalPoints": 0,
     "currentPoints": 0
   },
@@ -27,11 +21,7 @@
     "username": "some other kid",
     "password": "password",
     "name": "some other kid",
-    "tasks": [
-      {
-        "id": "5b4d0a9ff15077770d9ea462"
-      }
-    ],
+    "tasks": [],
     "totalPoints": 5545,
     "currentPoints": 45
   },
@@ -39,11 +29,7 @@
     "username": "trashKid",
     "password": "password",
     "name": "TrashKid",
-    "tasks": [
-      {
-        "id": "5b4d0a9ff15077770d9ea462"
-      }
-    ],
+    "tasks": [],
     "totalPoints": 990,
     "currentPoints": 490
   }

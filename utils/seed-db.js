@@ -13,9 +13,27 @@ const seedParent = require('../DB/seed/parent');
 const seedChild = require('../DB/seed/child');
 const seedTasks = require('../DB/seed/tasks');
 const seedRewards = require('../DB/seed/rewards');
+
 let parentIds = [];
 let childIds = [];
-// let rewardIds = [];
+let taskIds = [];
+
+function insertCollection(collection, seedToUpdate, callback){
+  let inserted = 0;
+  for (let i = 0; i < collection.length; i++) {
+    Child.findByIdAndUpdate({_id:collection[i]}, seedToUpdate[i], function(err){
+      if(err){
+        callback(err);
+        return;
+      }
+      if(++inserted == collection.length){
+        callback();
+      }
+    });
+  }
+}
+
+
 mongoose.connect(DATABASE_URL)
   .then(() => {
     mongoose.connection.db.dropDatabase();
@@ -28,7 +46,6 @@ mongoose.connect(DATABASE_URL)
     ]);
   })
   .then((results) => {    
-    // console.log("kids digest",results);
     
     seedParent.forEach((user, i) => {user.password = results[0][i]});
     seedChild.forEach((kid, i) => kid.password = results[1][i]);
@@ -38,10 +55,8 @@ mongoose.connect(DATABASE_URL)
       Parent.createIndexes(),      
     ]);
   })
-  .then(([result1]) => {
-    result1.forEach((user, i) => parentIds.push(user.id));
-    // result5.forEach((reward,i) => rewardIds.push(reward.id))
-    // console.log(parentIds);
+  .then(([parent]) => {
+    parent.forEach((user, i) => parentIds.push(user.id));
     seedTasks.forEach((task,i) => task.parentId = parentIds[i]);
     seedRewards.forEach((reward,i) => reward.parentId = parentIds[i]);
     seedChild.forEach((kid,i) => kid.parentId = parentIds[i]);
@@ -60,7 +75,7 @@ mongoose.connect(DATABASE_URL)
         childIds = results.map(child => child.id);
         // console.log('childIds: ',childIds);        
       })
-  })
+  })  
   .then(() => {
     seedTasks.forEach((task,i) => task.child = childIds[i]);
     return Promise.all([
@@ -68,6 +83,39 @@ mongoose.connect(DATABASE_URL)
       Tasks.createIndexes()
     ])
   })
+  .then(() => {
+    return Tasks.find()
+      .then(results => {
+        taskIds = results.map(task => task.id);
+        // console.log('taskIds: ',taskIds);        
+      })
+  })
+
+
+
+  .then(() => {
+    seedChild.forEach((child,i) => child.tasks = [taskIds[i]]);
+    return Child.findOneAndUpdate({_id:childIds[0]},seedChild[0])
+  })    
+  .then(() => Child.findOneAndUpdate({_id:childIds[1]},seedChild[1]))
+  .then(() => Child.findOneAndUpdate({_id:childIds[2]},seedChild[2]))
+  .then(() => Child.findOneAndUpdate({_id:childIds[3]},seedChild[3]))
+
+
+
+
+
+  .then(() => {
+    seedParent.forEach((parent,i) => parent.child = [childIds[i]]);
+    return Parent.findOneAndUpdate({_id:parentIds[0]},seedParent[0])
+  })    
+  .then(() => Parent.findOneAndUpdate({_id:parentIds[1]},seedParent[1]))
+  .then(() => Parent.findOneAndUpdate({_id:parentIds[2]},seedParent[2]))
+  .then(() => Parent.findOneAndUpdate({_id:parentIds[3]},seedParent[3]))
+
+
+
+
   .then(() => mongoose.disconnect())
   .catch(err => {
     console.error(`ERROR: ${err.message}`);

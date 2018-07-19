@@ -11,7 +11,7 @@ const Tasks = require('../models/tasks');
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 
-//get all tasks
+//get all Parents tasks
 router.get('/', (req, res, next) => {
 
   const userId = req.user.id;
@@ -20,6 +20,22 @@ router.get('/', (req, res, next) => {
     .sort({ 'updatedAt': 'desc' })
     .then(results => {
       res.json(results);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+// GET Child tasks
+
+router.get('/child', (req, res, next) => {
+  const userId = req.user.id;
+  console.log('userId: ', userId);
+  
+
+  Tasks.find({ child: userId })
+    .then(rewards => {
+      res.json(rewards);
     })
     .catch(err => {
       next(err);
