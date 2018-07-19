@@ -51,6 +51,22 @@ router.get('/', (req, res, next) => {
     });
 });
 
+// GET Child rewards
+
+router.get('/child', (req, res, next) => {
+  const { parentId } = req.user;
+  console.log('xx',parentId);
+  
+
+  Rewards.find({ parentId })
+    .then(rewards => {
+      res.json(rewards);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 //Update Reward
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;

@@ -4,7 +4,7 @@
     "pointValue": 5,
     "complete": false,
     "child": [
-      {"id": "5b4d0890a6b4fb75280719a9"}
+      "5b4d0890a6b4fb75280719a9"
     ],
     "parentId": null
   },
@@ -13,7 +13,7 @@
     "pointValue": 5,
     "complete": false,
     "child": [
-      {"id": "5b4d0890a6b4fb75280719a9"}
+      "5b4d0890a6b4fb75280719a9"
     ],
     "parentId": null
   },
@@ -22,7 +22,7 @@
     "pointValue": 10,
     "complete": false,
     "child": [
-      {"id": "5b4d0890a6b4fb75280719a9"}
+      "5b4d0890a6b4fb75280719a9"
     ],
     "parentId": null
   },
@@ -31,7 +31,7 @@
     "pointValue": 25,
     "complete": false,
     "child": [
-      {"id": "5b4d0890a6b4fb75280719a9"}
+      "5b4d0890a6b4fb75280719a9"
     ],
     "parentId": null
   }

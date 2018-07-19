@@ -28,10 +28,14 @@ router.get('/', (req, res, next) => {
 
 //create task
 
-router.post('/', (req, res, next) => {
+router.post('/:childId', (req, res, next) => {
   const requiredFields = ['name', 'pointValue'];
 
-  const userId = req.user.id;
+  const userId = req.user.id; // current signed in Parent
+
+  const { childId } = req.params;
+  console.log('childId',childId);
+  
 
   const missingField = requiredFields.find(field => !(field in req.body));
 
@@ -63,7 +67,8 @@ router.post('/', (req, res, next) => {
     pointValue,
     parentId: userId,
     currentTime: moment().valueOf(),
-    expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf()
+    expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf(),
+    child: [childId]
   };
   return Tasks.create(newTask)
     .then(result => {
