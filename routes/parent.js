@@ -201,8 +201,8 @@ router.post('/child', (req, res, next) => {
         username,
         password: digest,
         name,
-        email,
-        isParent: false,
+        // email,
+        // isParent: false,
         parentId: userId
       };
       return Child.create(newUser);
