@@ -20,6 +20,18 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/:id', (req, res, next) => {
+  Child.find({_id: req.params.id})
+    .then(user => {
+      res.json(user);
+    })
+    .catch(err => {
+      console.error(err);
+      next(err);
+    });
+});
+
+
 /* ==================================================================================== */
 // PROTECTION FOR THE FOLLOWING ENDPOINTS
 router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
