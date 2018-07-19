@@ -7,7 +7,7 @@ const childSchema = mongoose.Schema({
 
   name: {type: String, required: true},
   username: {type: String, required: true, unique: true},
-  email: {type: String},
+  // email: {type: String},
   password: {type: String, required: true},
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   totalPoints: {type: Number, required: true, default: 0},

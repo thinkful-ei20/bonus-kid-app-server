@@ -10,9 +10,9 @@ const parentSchema = mongoose.Schema({
   password: {type: String, required: true},
   isParent: {type: Boolean, required: true},
   child: [
-    {
-      id: {type: mongoose.Schema.ObjectId, ref: 'Child'},
-    }
+    
+    {type: mongoose.Schema.ObjectId, ref: 'Child'}
+    
   ]
 });
 

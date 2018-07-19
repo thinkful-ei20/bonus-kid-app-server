@@ -78,7 +78,7 @@ router.post('/', (req, res, next) => {
 
   // Create the new user
   let { username, password, name, email, isParent } = req.body;
-  
+
   return Parent.hashPassword(password)
     .then(digest => {
       const newUser = {
@@ -120,7 +120,7 @@ router.get('/', (req, res, next) => {
 
 /* ==================================================================================== */
 // PROTECTION FOR THE FOLLOWING ENDPOINTS
-router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 /* =================================================================================== */
 
@@ -194,7 +194,7 @@ router.post('/child', (req, res, next) => {
   // Create the new user
   const { username, password, name, email } = req.body;
   const userId = req.user.id
-  
+
   return Child.hashPassword(password)
     .then(digest => {
       const newUser = {
@@ -203,14 +203,28 @@ router.post('/child', (req, res, next) => {
         name,
         email,
         isParent: false,
-        parentId: userId        
+        parentId: userId
       };
       return Child.create(newUser);
     })
     .then(result => {
-      return res.status(201)
-        .location(`/api/users/child/${result.id}`)
-        .json(result);
+      let updateParent = {};
+      Parent.find({ _id: userId })
+        .then(parent => {
+          updateParent.child = [...parent[0].child, result.id];
+          return;
+        })
+        .then(() => {
+          Parent.findByIdAndUpdate(userId, updateParent, { new: true })
+            .then(parent => {
+              console.log(parent);
+              return res.status(201)
+                .location(`/api/users/child/${result.id}`)
+                .json(result);
+            });
+        })
+
+
     })
     .catch(err => {
       if (err.code === 11000) {
