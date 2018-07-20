@@ -100,6 +100,10 @@ router.post('/', (req, res, next) => {
         err = new Error('The username already exists');
         err.status = 400;
       }
+      if(err.message === 'Parent validation failed: name: Path `name` is required.'){
+        err = new Error('name is required');
+        err.status = 400;
+      }
       console.error(err);
       next(err);
     });
@@ -231,6 +235,10 @@ router.post('/child', (req, res, next) => {
         err = new Error('The username already exists');
         err.status = 400;
       }
+      if(err.message === 'Child validation failed: name: Path `name` is required.'){
+        err = new Error('name is required');
+        err.status = 400;
+      }
       console.error(err);
       next(err);
     });
@@ -249,7 +257,12 @@ router.delete('/:id', (req, res, next) => {
       res.status(204).end();
     })
     .catch(err => {
-      console.error(err);
+      if(err.value === 'child'){
+        let error = new Error('invalid id');
+        error.status = 400;
+        next(error);
+      }
+      console.error(err.message);
       next(err);
     });
 });
@@ -257,6 +270,7 @@ router.delete('/:id', (req, res, next) => {
 // DELETE A CHILD BY ID
 router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
+  
 
   Child.findOneAndRemove({ _id: id })
     .then(() => {
@@ -266,7 +280,12 @@ router.delete('/child/:id', (req, res, next) => {
       res.status(204).end();
     })
     .catch(err => {
-      console.error(err);
+      if(err.value === 'child'){
+        let error = new Error('invalid id');
+        error.status = 400;
+        next(error);
+      }
+      console.error(err.message);
       next(err);
     });
 });

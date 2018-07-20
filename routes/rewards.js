@@ -33,6 +33,17 @@ router.post('/', (req, res, next) => {
         error.status = 400;
         next(error);
       }
+      if(err.message === 'Rewards validation failed: name: Path `name` is required.'){
+        let error = new Error('name is required');
+        error.status = 400;
+        next(error);
+      }
+      if(err.message === 'Rewards validation failed: points: Path `points` is required.'){
+        let error = new Error('points are required');
+        error.status = 400;
+        next(error);
+      }
+      
       next(err);
     });
 });
