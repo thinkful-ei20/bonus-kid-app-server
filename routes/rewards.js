@@ -63,7 +63,7 @@ router.get('/', (req, res, next) => {
 });
 
 // GET Child rewards
-
+//needs work
 router.get('/child', (req, res, next) => {
   const { parentId } = req.user;
   console.log('xx',parentId);
