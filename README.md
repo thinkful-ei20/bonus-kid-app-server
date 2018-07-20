@@ -503,3 +503,282 @@ Reward Endpoints
     }
     
 ```
+
+- **DELETE/api/rewards/:id** Delete reward by id
+
+``` 
+    //What you send
+
+      Request to endpoint 
+        http://localhost:8080/api/rewards/5b520d6e9932103a758f3042
+
+    //Success
+
+    {
+      "purchased": false,
+      "expiryDate": "",
+      "currentTime": "",
+      "name": "hello",
+      "points": 32,
+      "parentId": "5b520d6c9932103a758f303a",
+      "id": "5b520d6e9932103a758f3042"
+    }
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+Tasks Endpoints
+-------------------
+
+- **GET/api/tasks/** Get all tasks 
+
+``` 
+    //What you send
+
+      Request to endpoint 
+        http://localhost:8080/api/tasks
+
+    //Success
+
+    [
+      {
+        "complete": false,
+        "expiryDate": "",
+        "currentTime": "",
+        "childComplete": false,
+        "name": "A on a test",
+        "pointValue": 10,
+        "child": "5b520d6e9932103a758f3040",
+        "parentId": "5b520d6c9932103a758f303c",
+        "createdAt": "2018-07-20T16:27:26.902Z",
+        "updatedAt": "2018-07-20T16:27:26.902Z",
+        "id": "5b520d6e9932103a758f3048"
+      }
+    ]
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+- **GET/api/tasks/child** Get all tasks for child
+
+``` 
+    //What you send
+
+      Request to endpoint 
+        http://localhost:8080/api/tasks/child
+
+    //Success
+
+    [
+      {
+        "complete": false,
+        "expiryDate": "",
+        "currentTime": "",
+        "childComplete": false,
+        "name": "daily chore",
+        "pointValue": 5,
+        "child": "5b520d6e9932103a758f303e",
+        "parentId": "5b520d6c9932103a758f303a",
+        "createdAt": "2018-07-20T16:27:26.902Z",
+        "updatedAt": "2018-07-20T16:27:26.902Z",
+        "id": "5b520d6e9932103a758f3046"
+      }
+    ]
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+- **GET/api/tasks/:childId** Get all tasks with childId
+
+``` 
+    //What you send
+
+      Request to endpoint 
+        http://localhost:8080/api/tasks/5b520d6e9932103a758f3046
+
+    //Success
+
+    [
+      {
+        "complete": false,
+        "expiryDate": "",
+        "currentTime": "",
+        "childComplete": false,
+        "name": "ya did gud, kid",
+        "pointValue": 25,
+        "child": "5b520d6e9932103a758f3041",
+        "parentId": "5b520d6c9932103a758f303d",
+        "createdAt": "2018-07-20T16:27:26.902Z",
+        "updatedAt": "2018-07-20T16:27:26.902Z",
+        "id": "5b520d6e9932103a758f3049"
+      }
+    ]
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+- **POST/api/tasks/:childId** create a new task for the child
+
+``` 
+    //required in req body {name, pointValue}
+
+    //What you send
+
+    {
+       "name": "name",
+       "pointValue": "32"
+    }
+
+    //Success
+
+    {
+      "complete": false,
+      "expiryDate": "1532110945811",
+      "currentTime": "1532110945810",
+      "name": "name",
+      "pointValue": 32,
+      "parentId": "5b520d6e9932103a758f303e",
+      "child": "5b520d6e9932103a758f3041",
+      "createdAt": "2018-07-20T18:22:25.819Z",
+      "updatedAt": "2018-07-20T18:22:25.819Z",
+      "id": "5b52286145c2dd08842d595b"
+    }
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+
+    //Missing pointValue
+
+    {
+      "message": "Missing pointValue in request body",
+      "error": {
+        "status": 422
+      }
+    }
+
+    //Missing name
+
+    {
+      "message": "Missing name in request body",
+      "error": {
+        "status": 422
+      }
+    }
+    
+```
+
+- **PUT/api/tasks/:id** update task
+
+``` 
+    //What you send
+
+    {
+       "name": "name1",
+       "pointValue": "32"
+    }
+
+    //Success
+
+    {
+      "complete": false,
+      "expiryDate": "1532110945811",
+      "currentTime": "1532110945810",
+      "name": "name1",
+      "pointValue": 32,
+      "parentId": "5b520d6e9932103a758f303e",
+      "child": "5b520d6e9932103a758f3041",
+      "createdAt": "2018-07-20T18:22:25.819Z",
+      "updatedAt": "2018-07-20T18:22:25.819Z",
+      "id": "5b52286145c2dd08842d595b"
+    }
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+
+    //Missing pointValue
+
+    {
+      "message": "Missing pointValue in request body",
+      "error": {
+        "status": 422
+      }
+    }
+
+    //Missing name
+
+    {
+      "message": "Missing name in request body",
+      "error": {
+        "status": 422
+      }
+    }
+    
+```
