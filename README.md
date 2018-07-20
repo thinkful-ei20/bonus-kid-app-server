@@ -341,12 +341,12 @@ Reward Endpoints
 - **POST/api/rewards** Endpoint to create a reward
 
 ``` 
-    //required in req body { name, points, purchased}
+    //required in req body { name, pointValue, purchased}
     
     //What you send
 
      {
-       "points":"23",
+       "pointValue":"23",
        "purchased": "false",
        "name": "Darren"
      }
@@ -359,7 +359,7 @@ Reward Endpoints
       "currentTime": "1532103435726",
       "parentId": "5b51fffa3a17042dc8fa522f",
       "name": "Darren",
-      "points": 23,
+      "pointValue": 23,
       "id": "5b520b0bb4dbb8380c41594d"
     }
     
@@ -375,10 +375,10 @@ Reward Endpoints
       }
     }
 
-    //Missing points in req body
+    //Missing pointValue in req body
 
     {
-      "message": "points are required",
+      "message": "pointValue are required",
       "error": {
         "status": 400
       }
@@ -389,7 +389,7 @@ Reward Endpoints
 - **GET/api/rewards** Endpoint to get a reward
 
 ``` 
-    //required in req body { name, points, purchased}
+    //required in req body { name, pointValue, purchased}
     
     //What you send
 
@@ -404,7 +404,7 @@ Reward Endpoints
         "expiryDate": "",
         "currentTime": "",
         "name": "candy",
-        "points": 50,
+        "pointValue": 50,
         "parentId": "5b51fffa3a17042dc8fa522f",
         "id": "5b51fffc3a17042dc8fa5237"
       }

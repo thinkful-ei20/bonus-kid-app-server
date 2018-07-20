@@ -7,7 +7,7 @@ const tasksSchema = mongoose.Schema({
 
   name: {type: String, required: true},
   pointValue: {type: Number, required: true},
-  child: {type: mongoose.Schema.ObjectId, ref: 'Child'},
+  childId: {type: mongoose.Schema.ObjectId, ref: 'Child'},
   complete: {type: Boolean, default: false},
   childComplete: {type: Boolean, default: false},
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},

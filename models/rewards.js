@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');'use strict';
 const rewardsSchema = mongoose.Schema({
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   name: {type: String, required: true},
-  points: {type: Number, required: true},
+  pointValue: {type: Number, required: true},
   purchased: {type: Boolean, required: true, default: false},
   expiryDate: {type: String, require:true, default: ''},
   currentTime: {type: String, require: true, default: ''}

@@ -18,20 +18,20 @@ let parentIds = [];
 let childIds = [];
 let taskIds = [];
 
-function insertCollection(collection, seedToUpdate, callback){
-  let inserted = 0;
-  for (let i = 0; i < collection.length; i++) {
-    Child.findByIdAndUpdate({_id:collection[i]}, seedToUpdate[i], function(err){
-      if(err){
-        callback(err);
-        return;
-      }
-      if(++inserted == collection.length){
-        callback();
-      }
-    });
-  }
-}
+// function insertCollection(collection, seedToUpdate, callback){
+//   let inserted = 0;
+//   for (let i = 0; i < collection.length; i++) {
+//     Child.findByIdAndUpdate({_id:collection[i]}, seedToUpdate[i], function(err){
+//       if(err){
+//         callback(err);
+//         return;
+//       }
+//       if(++inserted == collection.length){
+//         callback();
+//       }
+//     });
+//   }
+// }
 
 
 mongoose.connect(DATABASE_URL)
@@ -56,7 +56,7 @@ mongoose.connect(DATABASE_URL)
     ]);
   })
   .then(([parent]) => {
-    parent.forEach((user, i) => parentIds.push(user.id));
+    parent.forEach((user, i) => parentIds.push(user.id)); // push all parentId's to parentId's array for access
     seedTasks.forEach((task,i) => task.parentId = parentIds[i]);
     seedRewards.forEach((reward,i) => reward.parentId = parentIds[i]);
     seedChild.forEach((kid,i) => kid.parentId = parentIds[i]);
@@ -77,7 +77,7 @@ mongoose.connect(DATABASE_URL)
       })
   })  
   .then(() => {
-    seedTasks.forEach((task,i) => task.child = childIds[i]);
+    seedTasks.forEach((task,i) => task.childId = childIds[i]);
     return Promise.all([
       Tasks.insertMany(seedTasks),
       Tasks.createIndexes()

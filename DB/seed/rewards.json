@@ -1,23 +1,23 @@
 [
   {
     "name": "candy",
-    "points": 50,
+    "pointValue": 50,
     "purchased": false
   },
   {
     "name": "pizza night",
-    "points": 250,
+    "pointValue": 250,
     "purchased": false
   },
   {
     
     "name": "trip to amusement park",
-    "points": 1000,
+    "pointValue": 1000,
     "purchased": false
   },
   {
     "name": "movie night",
-    "points": 250,
+    "pointValue": 250,
     "purchased": false
   }
 ]

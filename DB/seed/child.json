@@ -3,9 +3,7 @@
     "username": "kiddo",
     "password": "password",
     "name": "kiddo",
-    "tasks": [
-      
-    ],
+    "tasks": [],
     "totalPoints": 0,
     "currentPoints": 0
   },
@@ -14,23 +12,23 @@
     "password": "password",
     "name": "bigkiddo",
     "tasks": [],
-    "totalPoints": 0,
-    "currentPoints": 0
+    "totalPoints": 10,
+    "currentPoints": 10
   },
   {
     "username": "some other kid",
     "password": "password",
     "name": "some other kid",
     "tasks": [],
-    "totalPoints": 5545,
-    "currentPoints": 45
+    "totalPoints": 100,
+    "currentPoints": 50
   },
   {
     "username": "trashKid",
     "password": "password",
     "name": "TrashKid",
     "tasks": [],
-    "totalPoints": 990,
-    "currentPoints": 490
+    "totalPoints": 1050,
+    "currentPoints": 50
   }
 ]

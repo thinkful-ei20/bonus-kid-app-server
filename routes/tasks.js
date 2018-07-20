@@ -14,9 +14,9 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 //get all Parents tasks
 router.get('/', (req, res, next) => {
 
-  const userId = req.user.id;
+  const parentId = req.user.id;
 
-  Tasks.find({ parentId: userId })
+  Tasks.find({ parentId })
     .sort({ 'updatedAt': 'desc' })
     .then(results => {
       res.json(results);
@@ -29,13 +29,13 @@ router.get('/', (req, res, next) => {
 // GET Child tasks
 
 router.get('/child', (req, res, next) => {
-  const userId = req.user.id;
-  console.log('userId: ', userId);
+  const childId = req.user.id;
+  console.log('childId: ', childId);
   
 
-  Tasks.find({ child: userId })
-    .then(rewards => {
-      res.json(rewards);
+  Tasks.find({ childId })
+    .then(tasks => {
+      res.json(tasks);
     })
     .catch(err => {
       next(err);
@@ -45,8 +45,8 @@ router.get('/child', (req, res, next) => {
 //get task by childId
 router.get('/:childId', (req,res,next) => {
   const {childId} = req.params;
-  console.log(childId);
-  Tasks.find({child: childId})
+  console.log('childId: ',childId);
+  Tasks.find({ childId })
     .then(tasks => {
       res.json(tasks);
     })
@@ -60,7 +60,7 @@ router.get('/:childId', (req,res,next) => {
 router.post('/:childId', (req, res, next) => {
   const requiredFields = ['name', 'pointValue'];
 
-  const userId = req.user.id; // current signed in Parent
+  const parentId = req.user.id; // current signed in Parent
 
   const { childId } = req.params;
   console.log('childId',childId);
@@ -94,10 +94,10 @@ router.post('/:childId', (req, res, next) => {
   const newTask = {
     name,
     pointValue,
-    parentId: userId,
+    parentId,
     currentTime: moment().valueOf(),
     expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf(),
-    child: [childId]
+    childId: [childId]
   };
   return Tasks.create(newTask)
     .then(result => {
@@ -136,7 +136,7 @@ router.put('/:id', (req, res, next) => {
       .then(result => {
         returnResult = result;
         // console.log(result);
-        return Child.findById(result.child)
+        return Child.findById(result.childId)
         // res.json(result);
       })
       .then(result => {
@@ -162,7 +162,7 @@ router.put('/:id', (req, res, next) => {
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
         returnResult = result;
-        return Child.findById(result.child)
+        return Child.findById(result.childId)
       })
       .then(result => {
         let updatedScore = {};
@@ -207,13 +207,13 @@ router.put('/child/:id', (req,res,next) => {
   const { id } = req.params;
   let { childComplete } = req.body;
   const updateTask = {};
-  const userId = req.user.id
+  const childId = req.user.id
 
   if(childComplete){
     updateTask.childComplete = true;
   } 
 
-  Tasks.findByIdAndUpdate({_id:id, child:userId}, updateTask, { new: true } )
+  Tasks.findByIdAndUpdate({_id:id, childId}, updateTask, { new: true } )
     .then(result => {
       res.json(result);
     })
@@ -268,9 +268,9 @@ router.put('/child/:id', (req,res,next) => {
 //delete task
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
-  const userId = req.user.id;
+  const parentId = req.user.id;
 
-  Tasks.findOneAndRemove({ _id: id, parentId: userId })
+  Tasks.findOneAndRemove({ _id: id, parentId })
     .then(() => {
       res.status(204).end();
     })

@@ -12,14 +12,14 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 //Create Parent Reward
 router.post('/', (req, res, next) => {
-  let { name, points, purchased , day, hour} = req.body;
+  let { name, pointValue, purchased , day, hour} = req.body;
   const { id } = req.user;
   if(!day) day = 0;
   if(!hour) hour = 0;
   Rewards.create({
     parentId: id,
     name,
-    points,
+    pointValue,
     purchased,
     currentTime: moment().valueOf(),
     expiryDate: moment().add(day,'days').add(hour,'hours').valueOf()
@@ -38,8 +38,8 @@ router.post('/', (req, res, next) => {
         error.status = 400;
         next(error);
       }
-      if(err.message === 'Rewards validation failed: points: Path `points` is required.'){
-        let error = new Error('points are required');
+      if(err.message === 'Rewards validation failed: pointValue: Path `pointValue` is required.'){
+        let error = new Error('pointValue are required');
         error.status = 400;
         next(error);
       }
@@ -81,7 +81,7 @@ router.get('/child', (req, res, next) => {
 //Update Reward
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
-  let { name, points, hour, day } = req.body;
+  let { name, pointValue, hour, day } = req.body;
   hour = parseInt(hour);
   day = parseInt(day);
   const updatedReward = {};
@@ -89,8 +89,8 @@ router.put('/:id', (req, res, next) => {
   if(name){
     updatedReward.name = name;
   }
-  if (points){
-    updatedReward.points = points;
+  if (pointValue){
+    updatedReward.pointValue = pointValue;
   } 
   if (hour > 0 || day > 0){
     console.log('this ran');
