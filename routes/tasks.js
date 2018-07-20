@@ -110,7 +110,7 @@ router.post('/:childId', (req, res, next) => {
     });
 });
 
-//update task
+//update task Parent 
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   let { name, pointValue, hour, day, complete } = req.body;
@@ -129,10 +129,10 @@ router.put('/:id', (req, res, next) => {
     console.log('this ran');
     updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
   }
-  if(complete){
+  if(complete === true){
     updatedTask.complete = true;
     let returnResult;
-    Tasks.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedTask, { new: true })
+    Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
         returnResult = result;
         // console.log(result);
@@ -143,6 +143,8 @@ router.put('/:id', (req, res, next) => {
         console.log(returnResult);
         let updatedScore = {};
         updatedScore.currentPoints = parseInt(returnResult.pointValue) + parseInt(result.currentPoints);
+        updatedScore.totalPoints = parseInt(returnResult.pointValue) + parseInt(result.totalPoints);
+
         console.log('updatedScore', updatedScore, updatedTask.pointValue, result.currentPoints);
         console.log('hey',result);
         return  Child.findByIdAndUpdate({_id: result.id}, updatedScore);
@@ -153,11 +155,34 @@ router.put('/:id', (req, res, next) => {
       .catch(err => {
         next(err);
       });
-  } else if (hour === 0 && day === 0) {
+  } 
+  else if (complete === false){
+    updatedTask.complete = false;
+    let returnResult;
+    Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
+      .then(result => {
+        returnResult = result;
+        return Child.findById(result.child)
+      })
+      .then(result => {
+        let updatedScore = {};
+        updatedScore.currentPoints = parseInt(result.currentPoints) - parseInt(returnResult.pointValue);
+        updatedScore.totalPoints = parseInt(result.totalPoints) - parseInt(returnResult.pointValue);
+
+        return  Child.findByIdAndUpdate({_id: result.id}, updatedScore);
+      })
+      .then(() => {
+        res.json(returnResult);
+      })
+      .catch(err => {
+        next(err);
+      });
+  }   
+  else if (hour === 0 && day === 0) {
     Tasks.findById(id)
       .then(result => updatedTask.expiryDate = result.currentTime)
       .then(() => {
-        return Tasks.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedTask, { new: true })
+        return Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
           .then(result => {
             res.json(result);
           })
@@ -166,7 +191,7 @@ router.put('/:id', (req, res, next) => {
           });
       });
   } else {
-    Tasks.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedTask, { new: true })
+    Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
         res.json(result);
       })
@@ -175,6 +200,32 @@ router.put('/:id', (req, res, next) => {
       });
   }
 });
+
+// update task Child
+
+router.put('/child/:id', (req,res,next) => {
+  const { id } = req.params;
+  let { childComplete } = req.body;
+  const updateTask = {};
+  const userId = req.user.id
+
+  if(childComplete){
+    updateTask.childComplete = true;
+  } 
+
+  Tasks.findByIdAndUpdate({_id:id, child:userId}, updateTask, { new: true } )
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      next(err);
+    })
+});
+
+
+
+
+
 
 // Tasks.findOne({_id:id})
 //   .then((res) => {

@@ -3,6 +3,7 @@
     "name": "daily chore",
     "pointValue": 5,
     "complete": false,
+    "childComplete": false,
     "child": [
       "5b4d0890a6b4fb75280719a9"
     ],
@@ -12,6 +13,7 @@
     "name": "homework",
     "pointValue": 5,
     "complete": false,
+    "childComplete": false,
     "child": [
       "5b4d0890a6b4fb75280719a9"
     ],
@@ -21,6 +23,7 @@
     "name": "A on a test",
     "pointValue": 10,
     "complete": false,
+    "childComplete": false,
     "child": [
       "5b4d0890a6b4fb75280719a9"
     ],
@@ -30,6 +33,7 @@
     "name": "ya did gud, kid",
     "pointValue": 25,
     "complete": false,
+    "childComplete": false,
     "child": [
       "5b4d0890a6b4fb75280719a9"
     ],

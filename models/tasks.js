@@ -9,6 +9,7 @@ const tasksSchema = mongoose.Schema({
   pointValue: {type: Number, required: true},
   child: {type: mongoose.Schema.ObjectId, ref: 'Child'},
   complete: {type: Boolean, default: false},
+  childComplete: {type: Boolean, default: false},
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   expiryDate: {type: String, require:true, default: ''},
   currentTime: {type: String, require: true, default: ''} 
