@@ -7,7 +7,7 @@ const router = express.Router();
 const passport = require('passport');
 
 const Tasks = require('../models/tasks');
-
+const Child = require('../models/child');
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 
@@ -100,11 +100,11 @@ router.post('/:childId', (req, res, next) => {
 //update task
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
-  let { name, pointValue, hour, day } = req.body;
+  let { name, pointValue, hour, day, complete } = req.body;
   hour = parseInt(hour);
   day = parseInt(day);
   const userId = req.user.id;
-
+  console.log(id);
   const updatedTask = {};
   if(name){
     updatedTask.name = name;
@@ -116,8 +116,31 @@ router.put('/:id', (req, res, next) => {
     console.log('this ran');
     updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
   }
-
-  if (hour === 0 && day === 0) {
+  if(complete){
+    updatedTask.complete = true;
+    let returnResult;
+    Tasks.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedTask, { new: true })
+      .then(result => {
+        returnResult = result;
+        // console.log(result);
+        return Child.findById(result.child)
+        // res.json(result);
+      })
+      .then(result => {
+        console.log(returnResult);
+        let updatedScore = {};
+        updatedScore.currentPoints = parseInt(returnResult.pointValue) + parseInt(result.currentPoints);
+        console.log('updatedScore', updatedScore, updatedTask.pointValue, result.currentPoints);
+        console.log('hey',result);
+        return  Child.findByIdAndUpdate({_id: result.id}, updatedScore);
+      })
+      .then(() => {
+        res.json(returnResult);
+      })
+      .catch(err => {
+        next(err);
+      });
+  } else if (hour === 0 && day === 0) {
     Tasks.findById(id)
       .then(result => updatedTask.expiryDate = result.currentTime)
       .then(() => {
