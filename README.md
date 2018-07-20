@@ -1,6 +1,8 @@
 Bonus Kid Sever Endpoints
 ========================
 
+[Marked] lets you convert [Markdown] into HTML.  Markdown is a simple text format whose goal is to be very easy to read and write, even when not converted to HTML.  This demo page will let you type anything you like and see how it gets converted.  Live.  No more waiting around.
+
 
 Auth Endpoints
 -------------------
@@ -408,7 +410,84 @@ Reward Endpoints
         "parentId": "5b51fffa3a17042dc8fa522f",
         "id": "5b51fffc3a17042dc8fa5237"
       }
+    ]
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+- **GET/api/rewards/child** Endpoint to get a rewards from child
+
+``` 
+
+    //What you send
+
+      Request to endpoint 
+        http://localhost:8080/api/rewards/child
+
+    //Success
+
     [
+      {
+        "purchased": false,
+        "expiryDate": "",
+        "currentTime": "",
+        "name": "candy",
+        "points": 50,
+        "parentId": "5b520d6c9932103a758f303a",
+        "id": "5b520d6e9932103a758f3042"
+      }
+    ]
+
+    //Error
+
+    //Missing authToken
+
+    {
+      "message": "Unauthorized",
+      "error": {
+        "name": "AuthenticationError",
+        "message": "Unauthorized",
+        "status": 401
+      }
+    }
+    
+```
+
+- **PUT/api/rewards/:id** Endpoint to update reward
+
+``` 
+    //required in req body { name, points }
+
+    //What you send
+
+      {
+        "name": "name",
+        "points": "points"
+      }
+
+    //Success
+
+    {
+      "purchased": false,
+      "expiryDate": "",
+      "currentTime": "",
+      "name": "hello",
+      "points": 32,
+      "parentId": "5b520d6c9932103a758f303a",
+      "id": "5b520d6e9932103a758f3042"
+    }
 
     //Error
 
