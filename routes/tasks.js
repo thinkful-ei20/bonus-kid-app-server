@@ -42,6 +42,19 @@ router.get('/child', (req, res, next) => {
     });
 });
 
+//get task by childId
+router.get('/:childId', (req,res,next) => {
+  const {childId} = req.params;
+  console.log(childId);
+  Tasks.find({child: childId})
+    .then(tasks => {
+      res.json(tasks);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 //create task
 
 router.post('/:childId', (req, res, next) => {
