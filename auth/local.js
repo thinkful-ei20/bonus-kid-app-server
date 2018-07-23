@@ -8,7 +8,16 @@ const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
   console.log(username);
   User.find({ username })
+    .populate({
+      path: 'child', 
+      model: 'Child', 
+      populate: {
+        path: 'tasks',
+        model: 'Tasks'
+      }
+    })
     .then(results => {
+      console.log(results);
       user = results[0];
       if (!user) {
         return Promise.reject({

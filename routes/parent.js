@@ -112,14 +112,22 @@ router.post('/', (req, res, next) => {
 /* =================================================================================== */
 // GET ALL USERS
 router.get('/', (req, res, next) => {
-  Parent.find()
-    .then(user => {
-      res.json(user);
-    })
-    .catch(err => {
-      console.error(err);
-      next(err);
-    });
+  Parent.find().populate({
+    path: 'child', 
+    model: 'Child', 
+    populate: {
+      path: 'tasks',
+      model: 'Tasks'
+    }
+  }).then(result => res.json(result));
+  // Parent.find()
+  //   .then(user => {
+  //     res.json(user);
+  //   })
+  //   .catch(err => {
+  //     console.error(err);
+  //     next(err);
+  //   });
 });
 
 /* ==================================================================================== */
