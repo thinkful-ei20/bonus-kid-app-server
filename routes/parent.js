@@ -5,8 +5,19 @@ const passport = require('passport');
 
 const Parent = require('../models/parent');
 const Child = require('../models/child');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 
 const router = express.Router();
+
+//move to helper folder
+function createAuthToken(user) {
+  return jwt.sign({ user }, JWT_SECRET, {
+    subject: user.username,
+    expiresIn: JWT_EXPIRY
+  });
+}
+
 
 /* =================================================================================== */
 // CREATE NEW PARENT USER
@@ -236,14 +247,29 @@ router.post('/child', (req, res, next) => {
           return;
         })
         .then(() => {
-          Parent.findByIdAndUpdate(userId, updateParent, { new: true })
-            .then(parent => {
-              console.log(parent);
-              return res.status(201)
-                .location(`/api/users/child/${result.id}`)
-                .json(result);
-            });
+         return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
         })
+        .then(parent => {
+          console.log(parent);
+          Parent.findById(parent.id)
+            .populate([{
+              path: 'child', 
+              model: 'Child', 
+              populate: {
+                path: 'tasks',
+                model: 'Tasks'
+              }
+            }, 
+            {
+              path: 'rewards', 
+              model: 'Rewards'
+            }])
+            .then((result) => {
+              console.log('1',result);
+              const authToken = createAuthToken(result);
+              res.json({authToken});
+            })
+        });
 
 
     })
