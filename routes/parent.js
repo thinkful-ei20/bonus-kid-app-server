@@ -112,14 +112,23 @@ router.post('/', (req, res, next) => {
 /* =================================================================================== */
 // GET ALL USERS
 router.get('/', (req, res, next) => {
-  Parent.find().populate({
+  Parent.find().populate([{
     path: 'child', 
     model: 'Child', 
     populate: {
       path: 'tasks',
       model: 'Tasks'
     }
-  }).then(result => res.json(result));
+  }, 
+  {
+    path: 'rewards', 
+    model: 'Rewards'
+  }])
+  // .populate({
+  //   path: 'rewards', 
+  //   model: 'Rewards', 
+  // }).lean()
+  .then(result => res.json(result));
   // Parent.find()
   //   .then(user => {
   //     res.json(user);

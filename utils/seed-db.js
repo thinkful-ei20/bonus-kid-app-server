@@ -17,26 +17,11 @@ const seedRewards = require('../DB/seed/rewards');
 let parentIds = [];
 let childIds = [];
 let taskIds = [];
-
-// function insertCollection(collection, seedToUpdate, callback){
-//   let inserted = 0;
-//   for (let i = 0; i < collection.length; i++) {
-//     Child.findByIdAndUpdate({_id:collection[i]}, seedToUpdate[i], function(err){
-//       if(err){
-//         callback(err);
-//         return;
-//       }
-//       if(++inserted == collection.length){
-//         callback();
-//       }
-//     });
-//   }
-// }
-
+let rewardIds = [];
 
 mongoose.connect(DATABASE_URL)
   .then(() => {
-    mongoose.connection.db.dropDatabase();
+   return mongoose.connection.db.dropDatabase();
     // console.log(DATABASE_URL);
   })
   .then(() => {
@@ -46,7 +31,7 @@ mongoose.connect(DATABASE_URL)
     ]);
   })
   .then((results) => {    
-    
+    // console.log('first results', results);
     seedParent.forEach((user, i) => {user.password = results[0][i]});
     seedChild.forEach((kid, i) => kid.password = results[1][i]);
 
@@ -56,6 +41,7 @@ mongoose.connect(DATABASE_URL)
     ]);
   })
   .then(([parent]) => {
+    // console.log('second result for parents', parent);
     parent.forEach((user, i) => parentIds.push(user.id)); // push all parentId's to parentId's array for access
     seedTasks.forEach((task,i) => task.parentId = parentIds[i]);
     seedRewards.forEach((reward,i) => reward.parentId = parentIds[i]);
@@ -69,7 +55,15 @@ mongoose.connect(DATABASE_URL)
       Rewards.createIndexes()
     ])
   })
-  .then(() => {
+  .then((result) => {
+    // console.log('seedRewards', seedRewards);
+    // console.log('rewards', rewards[0]);
+    // console.log('rewards2',rewards[1]);
+    // console.log('rewards3', rewards[2]);
+    // console.log('rewards4', rewards[3]);
+    // console.log('rewards', result[2]);
+    result[2].forEach(reward => rewardIds.push(reward.id));
+    // console.log('rewardsId', rewardIds);
     return Child.find()
       .then(results => {
         childIds = results.map(child => child.id);
@@ -112,6 +106,10 @@ mongoose.connect(DATABASE_URL)
   .then(() => Parent.findOneAndUpdate({_id:parentIds[1]},seedParent[1]))
   .then(() => Parent.findOneAndUpdate({_id:parentIds[2]},seedParent[2]))
   .then(() => Parent.findOneAndUpdate({_id:parentIds[3]},seedParent[3]))
+  .then(() => Parent.findByIdAndUpdate(parentIds[0], {rewards: rewardIds[0]}))
+  .then(() => Parent.findByIdAndUpdate(parentIds[1], {rewards: rewardIds[1]}))
+  .then(() => Parent.findByIdAndUpdate(parentIds[2], {rewards: rewardIds[2]}))
+  .then(() => Parent.findByIdAndUpdate(parentIds[3], {rewards: rewardIds[3]}))
 
 
 

@@ -1,23 +1,28 @@
-'use strict'; 
+'use strict';
 
-const mongoose = require ('mongoose');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const parentSchema = mongoose.Schema({
-  name: {type: String, required: true},
-  username: {type: String, required: true, unique: true},
-  email: {type: String, required: true, unique: true},
-  password: {type: String, required: true},
-  isParent: {type: Boolean, required: true},
+  name: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  isParent: { type: Boolean, required: true },
   child: [
-    
-    {type: mongoose.Schema.ObjectId, ref: 'Child'}
-    
+
+    { type: mongoose.Schema.ObjectId, ref: 'Child' }
+
+  ],
+  rewards: [
+
+    { type: mongoose.Schema.ObjectId, ref: 'Rewards' }
+
   ]
 });
 
 parentSchema.set('toObject', {
-  transform: function (doc,ret) {
+  transform: function (doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
