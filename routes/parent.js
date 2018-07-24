@@ -306,7 +306,6 @@ router.delete('/', (req, res, next) => {
       return Rewards.find({ parentId: req.user.id }).remove();
     })
     .then(() => {
-
       return Child.find({ parentId: req.user.id }).remove();
     })
     .then(() => {
