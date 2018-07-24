@@ -186,7 +186,7 @@ router.put('/:id', (req, res, next) => {
       .then(result => {
         returnResult = result;
         // console.log(result);
-        return Child.findById(result.childId)
+        return Child.findById(result.childId);
         // res.json(result);
       })
       .then(result => {
@@ -212,7 +212,7 @@ router.put('/:id', (req, res, next) => {
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
         returnResult = result;
-        return Child.findById(result.childId)
+        return Child.findById(result.childId);
       })
       .then(result => {
         let updatedScore = {};
@@ -228,6 +228,8 @@ router.put('/:id', (req, res, next) => {
         next(err);
       });
   }   
+  //Reseting the expire date 
+  //If hour and day === 0 the expire date is reset to current time
   else if (hour === 0 && day === 0) {
     Tasks.findById(id)
       .then(result => updatedTask.expiryDate = result.currentTime)
@@ -240,8 +242,31 @@ router.put('/:id', (req, res, next) => {
             next(err);
           });
       });
-  } else {
+  } 
+  //Normal update
+  else {
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
+      .then((result) => {
+        //populate the updated parent schema
+        return Parent.findById(result.parentId)
+          .populate([{
+            path: 'child',
+            model: 'Child',
+            populate: {
+              path: 'tasks',
+              model: 'Tasks'
+            }
+          },
+          {
+            path: 'rewards',
+            model: 'Rewards'
+          }]);
+      })
+      .then((result) => {
+      // console.log('1', result);
+        const authToken = createAuthToken(result);
+        res.json({ authToken });
+      })
       .then(result => {
         res.json(result);
       })
@@ -257,7 +282,7 @@ router.put('/child/:id', (req,res,next) => {
   const { id } = req.params;
   let { childComplete } = req.body;
   const updateTask = {};
-  const childId = req.user.id
+  const childId = req.user.id;
 
   if(childComplete){
     updateTask.childComplete = true;
@@ -269,7 +294,7 @@ router.put('/child/:id', (req,res,next) => {
     })
     .catch(err => {
       next(err);
-    })
+    });
 });
 
 
