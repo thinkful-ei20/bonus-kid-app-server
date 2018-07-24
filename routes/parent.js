@@ -5,6 +5,9 @@ const passport = require('passport');
 
 const Parent = require('../models/parent');
 const Child = require('../models/child');
+const Rewards = require('../models/rewards');
+const Tasks = require('../models/tasks');
+
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 
@@ -111,7 +114,7 @@ router.post('/', (req, res, next) => {
         err = new Error('The username already exists');
         err.status = 400;
       }
-      if(err.message === 'Parent validation failed: name: Path `name` is required.'){
+      if (err.message === 'Parent validation failed: name: Path `name` is required.') {
         err = new Error('name is required');
         err.status = 400;
       }
@@ -124,22 +127,22 @@ router.post('/', (req, res, next) => {
 // GET ALL USERS
 router.get('/', (req, res, next) => {
   Parent.find().populate([{
-    path: 'child', 
-    model: 'Child', 
+    path: 'child',
+    model: 'Child',
     populate: {
       path: 'tasks',
       model: 'Tasks'
     }
-  }, 
+  },
   {
-    path: 'rewards', 
+    path: 'rewards',
     model: 'Rewards'
   }])
-  // .populate({
-  //   path: 'rewards', 
-  //   model: 'Rewards', 
-  // }).lean()
-  .then(result => res.json(result));
+    // .populate({
+    //   path: 'rewards', 
+    //   model: 'Rewards', 
+    // }).lean()
+    .then(result => res.json(result));
   // Parent.find()
   //   .then(user => {
   //     res.json(user);
@@ -247,27 +250,27 @@ router.post('/child', (req, res, next) => {
           return;
         })
         .then(() => {
-         return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
+          return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
         })
         .then(parent => {
           console.log(parent);
           Parent.findById(parent.id)
             .populate([{
-              path: 'child', 
-              model: 'Child', 
+              path: 'child',
+              model: 'Child',
               populate: {
                 path: 'tasks',
                 model: 'Tasks'
               }
-            }, 
+            },
             {
-              path: 'rewards', 
+              path: 'rewards',
               model: 'Rewards'
             }])
             .then((result) => {
-              console.log('1',result);
+              console.log('1', result);
               const authToken = createAuthToken(result);
-              res.json({authToken});
+              res.json({ authToken });
             })
         });
 
@@ -278,7 +281,7 @@ router.post('/child', (req, res, next) => {
         err = new Error('The username already exists');
         err.status = 400;
       }
-      if(err.message === 'Child validation failed: name: Path `name` is required.'){
+      if (err.message === 'Child validation failed: name: Path `name` is required.') {
         err = new Error('name is required');
         err.status = 400;
       }
@@ -289,18 +292,31 @@ router.post('/child', (req, res, next) => {
 
 /* =================================================================================== */
 // DELETE A PARENT BY IDS
-router.delete('/:id', (req, res, next) => {
+router.delete('/', (req, res, next) => {
   const { id } = req.params;
-
-  Parent.findOneAndRemove({ _id: id })
+  console.log(req.user);
+  Parent.findById(req.user.id)
+    .then((result) => {
+      console.log(result);
+      // find and remove all associated Tasks
+      return Tasks.find({ parentId: req.user.id }).remove();
+    })
     .then(() => {
-      res.json({
-        message: 'Deleted parent user'
-      });
+      // find and remove all 
+      return Rewards.find({ parentId: req.user.id }).remove();
+    })
+    .then(() => {
+      
+      return Child.find({ parentId: req.user.id }).remove();
+    })
+    .then(() => {
+      return Parent.find({_id: req.user.id}).remove();
+    })
+    .then(() => {
       res.status(204).end();
     })
     .catch(err => {
-      if(err.value === 'child'){
+      if (err.value === 'child') {
         let error = new Error('invalid id');
         error.status = 400;
         next(error);
@@ -308,12 +324,29 @@ router.delete('/:id', (req, res, next) => {
       console.error(err.message);
       next(err);
     });
+
+  // Parent.findOneAndRemove({ _id: id })
+  //   .then(() => {
+  //     res.json({
+  //       message: 'Deleted parent user'
+  //     });
+  //     res.status(204).end();
+  //   })
+  //   .catch(err => {
+  //     if(err.value === 'child'){
+  //       let error = new Error('invalid id');
+  //       error.status = 400;
+  //       next(error);
+  //     }
+  //     console.error(err.message);
+  //     next(err);
+  //   });
 });
 
 // DELETE A CHILD BY ID
 router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
-  
+
 
   Child.findOneAndRemove({ _id: id })
     .then(() => {
@@ -323,7 +356,7 @@ router.delete('/child/:id', (req, res, next) => {
       res.status(204).end();
     })
     .catch(err => {
-      if(err.value === 'child'){
+      if (err.value === 'child') {
         let error = new Error('invalid id');
         error.status = 400;
         next(error);
