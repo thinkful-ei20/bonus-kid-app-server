@@ -213,9 +213,27 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
   Rewards.deleteOne({ _id: id, parentId: req.user.id })
-    .then(() => {
-      res.status(204).end();
-    })
+  .then(() => {
+    // console.log('before populate', result)
+    return Parent.findById(req.user.id)
+      .populate([{
+        path: 'child',
+        model: 'Child',
+        populate: {
+          path: 'tasks',
+          model: 'Tasks'
+        }
+      },
+      {
+        path: 'rewards',
+        model: 'Rewards'
+      }]);
+  })
+  .then((result) => {
+    console.log('result', result);
+    const authToken = createAuthToken(result);
+    return res.send({ authToken });
+  })
     .catch(error => {
       next(error);
     });
