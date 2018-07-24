@@ -306,11 +306,11 @@ router.delete('/', (req, res, next) => {
       return Rewards.find({ parentId: req.user.id }).remove();
     })
     .then(() => {
-      
+
       return Child.find({ parentId: req.user.id }).remove();
     })
     .then(() => {
-      return Parent.find({_id: req.user.id}).remove();
+      return Parent.find({ _id: req.user.id }).remove();
     })
     .then(() => {
       res.status(204).end();
@@ -347,26 +347,43 @@ router.delete('/', (req, res, next) => {
 router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
 
-  Child.find({_id: id})
+  Child.find({ _id: id })
     .then((result) => {
       console.log(result);
       return Tasks.find({ childId: id }).remove();
     })
     .then(() => {
-      return Child.find({_id: id}).remove();
+      return Child.find({ _id: id }).remove();
     })
     .then(() => {
-      res.status(204).end();
+      return Parent.findById(req.user.id)
+        .populate([{
+          path: 'child',
+          model: 'Child',
+          populate: {
+            path: 'tasks',
+            model: 'Tasks'
+          }
+        },
+        {
+          path: 'rewards',
+          model: 'Rewards'
+        }]);
+    })
+    .then((result) => {
+      console.log('result', result);
+      const authToken = createAuthToken(result);
+      return res.send({ authToken });
     })
     .catch(err => {
-          if (err.value === 'child') {
-            let error = new Error('invalid id');
-            error.status = 400;
-            next(error);
-          }
-          console.error(err.message);
-          next(err);
-        });
+      if (err.value === 'child') {
+        let error = new Error('invalid id');
+        error.status = 400;
+        next(error);
+      }
+      console.error(err.message);
+      next(err);
+    });
   // Child.findOneAndRemove({ _id: id })
   //   .then(() => {
   //     res.json({
