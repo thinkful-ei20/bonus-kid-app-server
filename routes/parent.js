@@ -293,7 +293,6 @@ router.post('/child', (req, res, next) => {
 /* =================================================================================== */
 // DELETE A PARENT BY IDS
 router.delete('/', (req, res, next) => {
-  const { id } = req.params;
   console.log(req.user);
   Parent.findById(req.user.id)
     .then((result) => {
