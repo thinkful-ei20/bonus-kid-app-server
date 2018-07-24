@@ -26,7 +26,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 router.post('/', (req, res, next) => {
   let { name, pointValue, purchased, day, hour } = req.body;
   const { id } = req.user;
-  let updatedRewards; 
+  let updatedRewards;
   let rewardTest;
   if (!day) day = 0;
   if (!hour) hour = 0;
@@ -47,15 +47,15 @@ router.post('/', (req, res, next) => {
       // .catch((err) => console.log(err));
     })
     .then(parent => {
-      console.log('after reward => ',rewardTest)
-      updatedRewards = {rewards: [...parent.rewards, rewardTest.id]};
+      console.log('after reward => ', rewardTest)
+      updatedRewards = { rewards: [...parent.rewards, rewardTest.id] };
       // updateParent.rewards = updatedRewards;
       console.log('updatedRewards', updatedRewards);
       console.log(true)
       return;
     })
     .then(() => {
-      return Parent.findByIdAndUpdate({_id: id}, updatedRewards, { new: true })
+      return Parent.findByIdAndUpdate({ _id: id }, updatedRewards, { new: true })
     })
     .then((result) => {
       console.log('before populate', result)
@@ -102,33 +102,33 @@ router.post('/', (req, res, next) => {
 
 // GET Parent rewards
 
-router.get('/', (req, res, next) => {
-  const { id } = req.user;
+// router.get('/', (req, res, next) => {
+//   const { id } = req.user;
 
-  Rewards.find({ parentId: id })
-    .then(rewards => {
-      res.json(rewards);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
+//   Rewards.find({ parentId: id })
+//     .then(rewards => {
+//       res.json(rewards);
+//     })
+//     .catch(err => {
+//       next(err);
+//     });
+// });
 
 // GET Child rewards
 //needs work
-router.get('/child', (req, res, next) => {
-  const { parentId } = req.user;
-  console.log('xx', parentId);
+// router.get('/child', (req, res, next) => {
+//   const { parentId } = req.user;
+//   console.log('xx', parentId);
 
 
-  Rewards.find({ parentId })
-    .then(rewards => {
-      res.json(rewards);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
+//   Rewards.find({ parentId })
+//     .then(rewards => {
+//       res.json(rewards);
+//     })
+//     .catch(err => {
+//       next(err);
+//     });
+// });
 
 //Update Reward
 router.put('/:id', (req, res, next) => {
@@ -152,18 +152,55 @@ router.put('/:id', (req, res, next) => {
     Rewards.findById(id)
       .then(result => updatedReward.expiryDate = result.currentTime)
       .then(() => {
-        return Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true })
-          .then(result => {
-            res.json(result);
-          })
-          .catch(err => {
-            next(err);
-          });
-      });
+        return Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true });
+      })
+      .then((result) => {
+        console.log('before populate', result)
+        return Parent.findById(result.parentId)
+          .populate([{
+            path: 'child',
+            model: 'Child',
+            populate: {
+              path: 'tasks',
+              model: 'Tasks'
+            }
+          },
+          {
+            path: 'rewards',
+            model: 'Rewards'
+          }]);
+      })
+      .then((result) => {
+        console.log('result', result);
+        const authToken = createAuthToken(result);
+        return res.send({ authToken });
+      })
+      .catch(err => {
+        next(err);
+      });;
+
   } else {
     Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true })
-      .then(result => {
-        res.json(result);
+      .then((result) => {
+        console.log('before populate', result)
+        return Parent.findById(result.parentId)
+          .populate([{
+            path: 'child',
+            model: 'Child',
+            populate: {
+              path: 'tasks',
+              model: 'Tasks'
+            }
+          },
+          {
+            path: 'rewards',
+            model: 'Rewards'
+          }]);
+      })
+      .then((result) => {
+        console.log('result', result);
+        const authToken = createAuthToken(result);
+        return res.send({ authToken });
       })
       .catch(err => {
         next(err);
