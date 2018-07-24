@@ -307,11 +307,23 @@ router.put('/child/:id', (req,res,next) => {
   } 
 
   Tasks.findByIdAndUpdate({_id:id, childId}, updateTask, { new: true } )
-    .then(result => {
-      res.json(result);
-    })
-    .catch(err => {
-      next(err);
+    .then((result) => {
+    //populate the updated child schema 
+      return Child.findById(result.childId)
+        .populate({ 
+          path: 'tasks',
+          model: 'Tasks'
+        })
+        .then((result) => {
+          const authToken = createAuthToken(result);
+          res.json({ authToken });
+        })
+        .then(result => {
+          res.json(result);
+        })
+        .catch(err => {
+          next(err);
+        });
     });
 });
 
