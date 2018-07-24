@@ -347,23 +347,42 @@ router.delete('/', (req, res, next) => {
 router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
 
-
-  Child.findOneAndRemove({ _id: id })
+  Child.find({_id: id})
+    .then((result) => {
+      console.log(result);
+      return Tasks.find({ childId: id }).remove();
+    })
     .then(() => {
-      res.json({
-        message: 'Deleted child user'
-      });
+      return Child.find({_id: id}).remove();
+    })
+    .then(() => {
       res.status(204).end();
     })
     .catch(err => {
-      if (err.value === 'child') {
-        let error = new Error('invalid id');
-        error.status = 400;
-        next(error);
-      }
-      console.error(err.message);
-      next(err);
-    });
+          if (err.value === 'child') {
+            let error = new Error('invalid id');
+            error.status = 400;
+            next(error);
+          }
+          console.error(err.message);
+          next(err);
+        });
+  // Child.findOneAndRemove({ _id: id })
+  //   .then(() => {
+  //     res.json({
+  //       message: 'Deleted child user'
+  //     });
+  //     res.status(204).end();
+  //   })
+  //   .catch(err => {
+  //     if (err.value === 'child') {
+  //       let error = new Error('invalid id');
+  //       error.status = 400;
+  //       next(error);
+  //     }
+  //     console.error(err.message);
+  //     next(err);
+  //   });
 });
 
 module.exports = router;
