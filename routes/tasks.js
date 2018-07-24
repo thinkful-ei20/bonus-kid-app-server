@@ -218,7 +218,7 @@ router.put('/:id', (req, res, next) => {
             console.log('1', result);
             const authToken = createAuthToken(result);
             res.json({ authToken });
-          })
+          });
       })
       .catch(err => {
         next(err);
@@ -382,8 +382,29 @@ router.delete('/:id', (req, res, next) => {
   const parentId = req.user.id;
 
   Tasks.findOneAndRemove({ _id: id, parentId })
-    .then(() => {
-      res.status(204).end();
+    .then((result) => {
+    //populate the updated parent schema
+      return Parent.findById(result.parentId)
+        .populate([{
+          path: 'child',
+          model: 'Child',
+          populate: {
+            path: 'tasks',
+            model: 'Tasks'
+          }
+        },
+        {
+          path: 'rewards',
+          model: 'Rewards'
+        }]);
+    })
+    .then((result) => {
+      // console.log('1', result);
+      const authToken = createAuthToken(result);
+      res.json({ authToken });
+    })
+    .then(result => {
+      res.json(result);
     })
     .catch(err => {
       next(err);
