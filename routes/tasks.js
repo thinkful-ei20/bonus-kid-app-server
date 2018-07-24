@@ -197,10 +197,28 @@ router.put('/:id', (req, res, next) => {
 
         console.log('updatedScore', updatedScore, updatedTask.pointValue, result.currentPoints);
         console.log('hey',result);
-        return  Child.findByIdAndUpdate({_id: result.id}, updatedScore);
+        return  Child.findByIdAndUpdate({_id: result.id}, updatedScore, {new: true});
       })
-      .then(() => {
-        res.json(returnResult);
+      .then(result => {
+        console.log('parentId', result.parentId);
+        Parent.findById(result.parentId)
+          .populate([{
+            path: 'child',
+            model: 'Child',
+            populate: {
+              path: 'tasks',
+              model: 'Tasks'
+            }
+          },
+          {
+            path: 'rewards',
+            model: 'Rewards'
+          }])
+          .then((result) => {
+            console.log('1', result);
+            const authToken = createAuthToken(result);
+            res.json({ authToken });
+          })
       })
       .catch(err => {
         next(err);
