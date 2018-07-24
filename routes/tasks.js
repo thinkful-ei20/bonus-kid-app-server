@@ -8,52 +8,67 @@ const passport = require('passport');
 
 const Tasks = require('../models/tasks');
 const Child = require('../models/child');
+const Parent = require('../models/parent');
+
+
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET, JWT_EXPIRY } = require('../config');
+
+//move to helper folder
+function createAuthToken(user) {
+  return jwt.sign({ user }, JWT_SECRET, {
+    subject: user.username,
+    expiresIn: JWT_EXPIRY
+  });
+}
+
+
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 
 //get all Parents tasks
-router.get('/', (req, res, next) => {
+// router.get('/', (req, res, next) => {
 
-  const parentId = req.user.id;
+//   const parentId = req.user.id;
 
-  Tasks.find({ parentId })
-    .sort({ 'updatedAt': 'desc' })
-    .then(results => {
-      res.json(results);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
+//   Tasks.find({ parentId })
+//     .sort({ 'updatedAt': 'desc' })
+//     .then(results => {
+//       res.json(results);
+//     })
+//     .catch(err => {
+//       next(err);
+//     });
+// });
 
 // GET Child tasks
 
-router.get('/child', (req, res, next) => {
-  const childId = req.user.id;
-  console.log('childId: ', childId);
+// router.get('/child', (req, res, next) => {
+//   const childId = req.user.id;
+//   console.log('childId: ', childId);
   
 
-  Tasks.find({ childId })
-    .then(tasks => {
-      res.json(tasks);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
+//   Tasks.find({ childId })
+//     .then(tasks => {
+//       res.json(tasks);
+//     })
+//     .catch(err => {
+//       next(err);
+//     });
+// });
 
 //get task by childId
-router.get('/:childId', (req,res,next) => {
-  const {childId} = req.params;
-  console.log('childId: ',childId);
-  Tasks.find({ childId })
-    .then(tasks => {
-      res.json(tasks);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
+// router.get('/:childId', (req,res,next) => {
+//   const {childId} = req.params;
+//   console.log('childId: ',childId);
+//   Tasks.find({ childId })
+//     .then(tasks => {
+//       res.json(tasks);
+//     })
+//     .catch(err => {
+//       next(err);
+//     });
+// });
 
 //create task
 
@@ -91,6 +106,8 @@ router.post('/:childId', (req, res, next) => {
   let { name, pointValue, day, hour } = req.body;
   if (!day) day = 0;
   if (!hour) hour = 0;
+  let updateChildTasks;
+  let newTaskId;
   const newTask = {
     name,
     pointValue,
@@ -101,10 +118,43 @@ router.post('/:childId', (req, res, next) => {
   };
   return Tasks.create(newTask)
     .then(result => {
-      return res.status(201)
-        .location(`${req.originalUrl}/${result.id}`)
-        .json(result);
+      newTaskId = result.id;
+      return Child.findById(childId);  
     })
+    .then((result) => {
+      console.log('result After creating task',result);
+      updateChildTasks = {tasks: [...result.tasks ,newTaskId]};
+      console.log('update',updateChildTasks);
+      return;
+    })
+    .then(() => {
+      return Child.findByIdAndUpdate(childId, updateChildTasks, {new: true});
+    })
+    .then((result) => {
+      return Parent.findById(result.parentId)
+        .populate([{
+          path: 'child',
+          model: 'Child',
+          populate: {
+            path: 'tasks',
+            model: 'Tasks'
+          }
+        },
+        {
+          path: 'rewards',
+          model: 'Rewards'
+        }]);
+    })
+    .then((result) => {
+      // console.log('1', result);
+      const authToken = createAuthToken(result);
+      res.json({ authToken });
+    })
+
+    
+    // return res.status(201)
+    //     .location(`${req.originalUrl}/${result.id}`)
+    //     .json(result);
     .catch(err => {
       next(err);
     });
