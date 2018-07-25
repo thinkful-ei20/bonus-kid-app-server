@@ -363,6 +363,26 @@ Our child calls to the endpoints will return updated authtokens that hold any up
 The decoded authToken will provide all the necessary data to render the pages (see above).
 
 ## CHILD REWARDS 
+
+- **GET /api/rewards/child**
+
+###Response 
+
+
+```
+[
+    {
+        "purchased": true,
+        "expiryDate": "",
+        "currentTime": "",
+        "name": "trip to amusement park",
+        "pointValue": 1000,
+        "parentId": "5b57405c028ed933fc3d6bb3",
+        "id": "5b57405c028ed933fc3d6bbb"
+    }
+]
+```
+
 - **PUT/api/rewards/child/:id** 
 
 ### Request
