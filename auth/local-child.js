@@ -8,10 +8,15 @@ const localChildStrategy = new LocalStrategy((username, password, done) => {
   let user;
   console.log(username);
   Child.find({ username })
-    .populate({ 
+    .populate([{ 
       path: 'tasks',
       model: 'Tasks'
-    })
+    },
+    {
+      path: 'rewards',
+      model: 'Rewards'
+    }
+    ])
     .then(results => {
       user = results[0];
       if (!user) {

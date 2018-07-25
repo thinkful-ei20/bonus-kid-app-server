@@ -14,6 +14,10 @@ const localStrategy = new LocalStrategy((username, password, done) => {
       populate: {
         path: 'tasks',
         model: 'Tasks'
+      },
+      populate: {
+        path: 'rewards',
+        model: 'Rewards'
       }
     }, 
     {

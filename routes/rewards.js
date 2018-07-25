@@ -246,26 +246,57 @@ router.get('/child', (req, res, next) => {
 
 router.put('/child/:id', (req, res, next) =>{
   const { id } = req.params;
+  const childId = req.user.id;
+  let editedReward;
   //reward id
-  let { purchased } = req.body;
-  const updateReward = {};
-
-  if (purchased === true){
-    const error = new Error('Reward already purchased');
-    error.status = 400;
-    return next(error);
-
-  } else if (purchased) {
-    updateReward.purchased = purchased;
-  }
-
-  Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
-    .then(result => {
-      res.json(result);
+  Rewards.findById(id)
+    .then(res => {
+      if(res.purchased === true){
+        const error = new Error('Reward already purchased');
+        error.status = 400;
+        throw next(error);
+      }
+      else {
+        let { purchased } = req.body;
+        const updateReward = {};
+        if(purchased === true){
+          updateReward.purchased = purchased;
+        }
+        return Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
+      }
     })
+    .then(result => {
+      editedReward = result;
+      console.log('result',result);
+      let newChild = {
+        currentPoints: req.user.currentPoints - editedReward.pointValue         
+      };   
+      // res.json(result);
+      return Child.findByIdAndUpdate(childId, newChild);
+    })
+    .then(() => res.json(editedReward))
     .catch(err => {
       next(err);
-    });
+    })    
+
+  // if (purchased === true){
+  //   const error = new Error('Reward already purchased');
+  //   error.status = 400;
+  //   return next(error);
+
+  // } else if (purchased) {
+  //   updateReward.purchased = purchased;
+  // } 
+
+  // Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
+  //   .then(result => {
+  //     console.log('result',result);
+      
+  //     res.json(result);
+  //   })
+  //   .catch(err => {
+  //     next(err);
+  //   })
 });
 
 module.exports = router;

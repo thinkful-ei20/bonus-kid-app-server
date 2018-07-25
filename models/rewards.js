@@ -1,12 +1,12 @@
 'use strict'; 
 
 const mongoose = require ('mongoose');
-const bcrypt = require('bcryptjs');'use strict'; 
 
 //add categories at later 
 
 const rewardsSchema = mongoose.Schema({
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
+  childId: {type: mongoose.Schema.ObjectId, ref: 'Child'},
   name: {type: String, required: true},
   pointValue: {type: Number, required: true},
   purchased: {type: Boolean, required: true, default: false},
