@@ -363,7 +363,7 @@ Our child calls to the endpoints will return updated authtokens that hold any up
 The decoded authToken will provide all the necessary data to render the pages (see above).
 
 ## CHILD REWARDS 
-- **PUT/api/child/:id** 
+- **PUT/api/rewards/child/:id** 
 
 ### Request
 
@@ -386,7 +386,7 @@ The decoded authToken will provide all the necessary data to render the pages (s
 ```
 
 ## CHILD TASKS
-- **PUT/api/child/:id** 
+- **PUT/api/tasks/child/:id** 
 
 ### Request
 
