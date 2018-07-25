@@ -8,7 +8,7 @@ const Child = require('../models/child');
 const router = express.Router();
 
 /* =================================================================================== */
-// GET ALL CHILD ACCOUNTS
+// ========== GET ALL CHILD ACCOUNTS FOR DEVELOPMENT ONLY ===================
 router.get('/', (req, res, next) => {
   Child.find()
     .then(user => {

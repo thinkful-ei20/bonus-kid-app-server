@@ -25,52 +25,7 @@ function createAuthToken(user) {
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-
-//get all Parents tasks
-// router.get('/', (req, res, next) => {
-
-//   const parentId = req.user.id;
-
-//   Tasks.find({ parentId })
-//     .sort({ 'updatedAt': 'desc' })
-//     .then(results => {
-//       res.json(results);
-//     })
-//     .catch(err => {
-//       next(err);
-//     });
-// });
-
-// GET Child tasks
-
-// router.get('/child', (req, res, next) => {
-//   const childId = req.user.id;
-//   console.log('childId: ', childId);
-  
-
-//   Tasks.find({ childId })
-//     .then(tasks => {
-//       res.json(tasks);
-//     })
-//     .catch(err => {
-//       next(err);
-//     });
-// });
-
-//get task by childId
-// router.get('/:childId', (req,res,next) => {
-//   const {childId} = req.params;
-//   console.log('childId: ',childId);
-//   Tasks.find({ childId })
-//     .then(tasks => {
-//       res.json(tasks);
-//     })
-//     .catch(err => {
-//       next(err);
-//     });
-// });
-
-//create task
+// ============ Create Task as Parent =================
 
 router.post('/:childId', (req, res, next) => {
   const requiredFields = ['name', 'pointValue'];
@@ -102,7 +57,7 @@ router.post('/:childId', (req, res, next) => {
     return next(err);
   }
 
-  //create new task
+  // Create new task update in DB
   let { name, pointValue, day, hour } = req.body;
   if (!day) day = 0;
   if (!hour) hour = 0;
@@ -160,7 +115,7 @@ router.post('/:childId', (req, res, next) => {
     });
 });
 
-//update task Parent 
+// ========== Update Task as Parent ================
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   let { name, pointValue, hour, day, complete } = req.body;
@@ -179,6 +134,7 @@ router.put('/:id', (req, res, next) => {
     console.log('this ran');
     updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
   }
+  // ================== Approve Task =====================
   if(complete === true){
     updatedTask.complete = true;
     let returnResult;
@@ -223,7 +179,8 @@ router.put('/:id', (req, res, next) => {
       .catch(err => {
         next(err);
       });
-  } 
+  }  
+  // =============== Reject Task Approve Request ==========================
   else if (complete === false){
     updatedTask.complete = false;
     let returnResult;
@@ -264,7 +221,7 @@ router.put('/:id', (req, res, next) => {
         next(err);
       });
   }   
-  //Reseting the expire date 
+  // =========== Reseting the Expire Date =========== 
   //If hour and day === 0 the expire date is reset to current time
   else if (hour === 0 && day === 0) {
     Tasks.findById(id)
@@ -279,7 +236,8 @@ router.put('/:id', (req, res, next) => {
           });
       });
   } 
-  //Normal update
+  // ============ Normal Update: name/pointValue/expireDate =================
+
   else {
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then((result) => {
@@ -312,7 +270,7 @@ router.put('/:id', (req, res, next) => {
   }
 });
 
-// update task Child
+// ========= Child Update Task, Submit for Approval ==============
 
 router.put('/child/:id', (req,res,next) => {
   const { id } = req.params;
@@ -388,7 +346,7 @@ router.put('/child/:id', (req,res,next) => {
 //   });
 
 
-//delete task
+// =========== Delete Task as Parent ===================
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
   const parentId = req.user.id;

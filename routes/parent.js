@@ -23,7 +23,8 @@ function createAuthToken(user) {
 
 
 /* =================================================================================== */
-// CREATE NEW PARENT USER
+//  ================= Create New Parent User =====================
+
 router.post('/', (req, res, next) => {
   const requiredFields = ['username', 'password', 'email'];
   const missingField = requiredFields.find(field => !(field in req.body));
@@ -90,7 +91,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  // Create the new user
+  // Create new Parent in DB
   let { username, password, name, email, isParent } = req.body;
 
   return Parent.hashPassword(password)
@@ -124,7 +125,7 @@ router.post('/', (req, res, next) => {
 });
 
 /* =================================================================================== */
-// GET ALL USERS
+// ========= GET ALL USERS FOR DEVELOPMENT ONLY ====================
 router.get('/', (req, res, next) => {
   Parent.find().populate([{
     path: 'child',
@@ -159,7 +160,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* =================================================================================== */
 
-// CREATE NEW CHILD USER
+// ================ Create a Child User as a Parent =====================
 router.post('/child', (req, res, next) => {
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
@@ -341,7 +342,7 @@ router.delete('/', (req, res, next) => {
   //   });
 });
 
-// DELETE A CHILD BY ID
+// ============== Delete a Child as a Parent =================
 router.delete('/child/:id', (req, res, next) => {
   const { id } = req.params;
 

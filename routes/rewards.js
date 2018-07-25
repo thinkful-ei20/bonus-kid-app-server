@@ -23,7 +23,7 @@ function createAuthToken(user) {
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-//Create Parent Reward
+// ============ Create Reward as Parent ===============
 router.post('/', (req, res, next) => {
   let { name, pointValue, purchased, day, hour } = req.body;
   const { id } = req.user;
@@ -101,7 +101,7 @@ router.post('/', (req, res, next) => {
     });
 });
 
-//GET Parent rewards
+// ============ GET Rewards as Parent =============
 
 router.get('/', (req, res, next) => {
   const { id } = req.user;
@@ -115,23 +115,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
-// GET Child rewards
-//needs work
-router.get('/child', (req, res, next) => {
-  const { parentId } = req.user;
-  console.log('xx', parentId);
-
-
-  Rewards.find({ parentId })
-    .then(rewards => {
-      res.json(rewards);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-//Update Reward
+// ============== Update Reward as Parent ==================
 router.put('/:id', (req, res, next) => {
   const { id } = req.params;
   let { name, pointValue, hour, day } = req.body;
@@ -209,7 +193,7 @@ router.put('/:id', (req, res, next) => {
   }
 });
 
-//DELETE Parent Rewards by id
+// =========== DELETE Rewards as Parent =====================
 
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
@@ -240,7 +224,25 @@ router.delete('/:id', (req, res, next) => {
     });
 });
 
-// =========== update child purchased ==========
+
+
+// =========== GET Rewards as Child ==============
+
+router.get('/child', (req, res, next) => {
+  const { parentId } = req.user;
+  console.log('xx', parentId);
+
+
+  Rewards.find({ parentId })
+    .then(rewards => {
+      res.json(rewards);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+// =========== Purchase Reward as Child ==========
 
 router.put('/child/:id', (req, res, next) =>{
   const { id } = req.params;
