@@ -14,6 +14,9 @@ const childSchema = mongoose.Schema({
   tasks: [
     {type: mongoose.Schema.ObjectId, ref: 'Tasks', required: true}
   ],
+  rewards: [
+    {type: mongoose.Schema.ObjectId, ref: 'Rewards'}
+  ]
   
     
   

@@ -130,10 +130,16 @@ router.get('/', (req, res, next) => {
   Parent.find().populate([{
     path: 'child',
     model: 'Child',
-    populate: {
-      path: 'tasks',
-      model: 'Tasks'
-    }
+    populate: [
+      {
+        path: 'tasks',
+        model: 'Tasks'
+      },        
+      {
+        path: 'rewards',
+        model: 'Rewards'
+      }        
+    ],
   },
   {
     path: 'rewards',
@@ -259,10 +265,16 @@ router.post('/child', (req, res, next) => {
             .populate([{
               path: 'child',
               model: 'Child',
-              populate: {
-                path: 'tasks',
-                model: 'Tasks'
-              }
+              populate: [
+                {
+                  path: 'tasks',
+                  model: 'Tasks'
+                },        
+                {
+                  path: 'rewards',
+                  model: 'Rewards'
+                }        
+              ],
             },
             {
               path: 'rewards',
@@ -359,10 +371,16 @@ router.delete('/child/:id', (req, res, next) => {
         .populate([{
           path: 'child',
           model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          }
+          populate: [
+            {
+              path: 'tasks',
+              model: 'Tasks'
+            },        
+            {
+              path: 'rewards',
+              model: 'Rewards'
+            }        
+          ],
         },
         {
           path: 'rewards',

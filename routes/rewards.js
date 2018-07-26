@@ -24,16 +24,19 @@ function createAuthToken(user) {
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 // ============ Create Reward as Parent ===============
-router.post('/', (req, res, next) => {
+router.post('/:childId', (req, res, next) => {
   let { name, pointValue, purchased, day, hour } = req.body;
+  let {childId} = req.params;
   const { id } = req.user;
   let updatedRewards;
   let rewardTest;
+  let updateChildRewards;
   if (!day) day = 0;
   if (!hour) hour = 0;
   let updateParent = {};
   Rewards.create({
     parentId: id,
+    childId,
     name,
     pointValue,
     purchased,
@@ -47,9 +50,20 @@ router.post('/', (req, res, next) => {
 
       // .catch((err) => console.log(err));
     })
-    .then(parent => {
-      console.log('after reward => ', rewardTest);
-      updatedRewards = { rewards: [...parent.rewards, rewardTest.id] };
+    .then(child => {
+      updateChildRewards = { rewards: [...child.rewards, rewardTest.id] };
+      // updateParent.rewards = updatedRewards;
+      console.log('updatedRewards', updatedRewards);
+      console.log(true);
+      return;
+    })
+    .then(() => {
+      return Child.findByIdAndUpdate(childId, updateChildRewards);
+    })
+    .then(() => {
+      console.log('parent ', req.user.rewards);
+      let rewardsIds = req.user.rewards.map((reward) => reward.id);
+      updatedRewards = { rewards: [...rewardsIds, rewardTest.id] };
       // updateParent.rewards = updatedRewards;
       console.log('updatedRewards', updatedRewards);
       console.log(true);
@@ -67,6 +81,10 @@ router.post('/', (req, res, next) => {
           populate: {
             path: 'tasks',
             model: 'Tasks'
+          },
+          populate: {
+            path: 'rewards',
+            model: 'Rewards'
           }
         },
         {
@@ -145,15 +163,21 @@ router.put('/:id', (req, res, next) => {
           .populate([{
             path: 'child',
             model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
+            populate:[ 
+              {
+                path: 'tasks',
+                model: 'Tasks'
+              },
+              {
+                path: 'rewards',
+                model: 'Rewards'
+              }
+            ],
           },
           {
             path: 'rewards',
             model: 'Rewards'
-          }]);
+          }])
       })
       .then((result) => {
         console.log('result', result);
@@ -172,10 +196,16 @@ router.put('/:id', (req, res, next) => {
           .populate([{
             path: 'child',
             model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
+            populate: [
+              {
+                path: 'tasks',
+                model: 'Tasks'
+              },
+              {
+                path: 'rewards',
+                model: 'Rewards'
+              }
+            ],
           },
           {
             path: 'rewards',
@@ -246,26 +276,105 @@ router.get('/child', (req, res, next) => {
 
 router.put('/child/:id', (req, res, next) =>{
   const { id } = req.params;
+  const childId = req.user.id;
+  let editedReward;
   //reward id
-  let { purchased } = req.body;
-  const updateReward = {};
-
-  if (purchased === true){
-    const error = new Error('Reward already purchased');
-    error.status = 400;
-    return next(error);
-
-  } else if (purchased) {
-    updateReward.purchased = purchased;
-  }
-
-  Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
-    .then(result => {
-      res.json(result);
+  Rewards.findById(id)
+    .then(res => {
+      if(res.purchased === true){
+        const error = new Error('Reward already purchased');
+        error.status = 400;
+        throw next(error);
+      }
+      else {
+        let { purchased } = req.body;
+        const updateReward = {};
+        if(purchased === true){
+          updateReward.purchased = purchased;
+        }
+        return Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
+      }
     })
+    .then(result => {
+      editedReward = result;
+      console.log('result',result);
+      let newChild = {
+        currentPoints: req.user.currentPoints - editedReward.pointValue         
+      };   
+      // res.json(result);
+      return Child.findByIdAndUpdate(childId, newChild);
+    })
+    .then(() => res.json(editedReward))
     .catch(err => {
       next(err);
-    });
+    })    
+
+  // if (purchased === true){
+  //   const error = new Error('Reward already purchased');
+  //   error.status = 400;
+  //   return next(error);
+
+  // } else if (purchased) {
+  //   updateReward.purchased = purchased;
+  // } 
+
+  // Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
+  //   .then(result => {
+  //     console.log('result',result);
+      
+  //     res.json(result);
+  //   })
+  //   .catch(err => {
+  //     next(err);
+  //   })
 });
 
 module.exports = router;
+
+
+
+//DELETE REWARD AS PARENT NEEDS FIX
+
+// router.delete('/:id', (req, res, next) => {
+//   const { id } = req.params;
+//   Rewards.deleteOne({ _id: id, parentId: req.user.id })
+//     // .then(() => Rewards.findById(id))
+//     .then( () => {
+//       let newRewards = req.user.rewards.filter(reward => reward.id === id);
+//       console.log('newRewards', newRewards[0].childId);
+     
+//       return Child.findById({_id:newRewards[0].childId})
+//     })
+//     .then(res => {
+//       console.log('RESSSS',res);
+//       var id = mongoose.Types.ObjectId('4edd40c86762e0fb12000003');
+//       let updateChild = {rewards: [id]}
+//       console.log('UPDATECHILD',updateChild);
+//       return Child.findByIdAndUpdate({id: res.id}, updateChild)
+//     })
+//     .then(() => {
+//     // console.log('before populate', result)
+//       return Parent.findById(req.user.id)
+//         .populate([{
+//           path: 'child',
+//           model: 'Child',
+//           populate:{           
+//               path: 'tasks',
+//               model: 'Tasks'
+//           },
+//         },
+//         {
+//           path: 'rewards',
+//           model: 'Rewards'
+//         }]);
+//     })
+//     .then((result) => {
+//       console.log('result', result);
+//       const authToken = createAuthToken(result);
+//       return res.send({ authToken });
+//     })
+//     .catch(error => {
+//       next(error);
+//     });
+//  });
+ 
