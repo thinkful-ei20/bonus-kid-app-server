@@ -163,15 +163,21 @@ router.put('/:id', (req, res, next) => {
           .populate([{
             path: 'child',
             model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
+            populate:[ 
+              {
+                path: 'tasks',
+                model: 'Tasks'
+              },
+              {
+                path: 'rewards',
+                model: 'Rewards'
+              }
+            ],
           },
           {
             path: 'rewards',
             model: 'Rewards'
-          }]);
+          }])
       })
       .then((result) => {
         console.log('result', result);
@@ -190,10 +196,16 @@ router.put('/:id', (req, res, next) => {
           .populate([{
             path: 'child',
             model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
+            populate: [
+              {
+                path: 'tasks',
+                model: 'Tasks'
+              },
+              {
+                path: 'rewards',
+                model: 'Rewards'
+              }
+            ],
           },
           {
             path: 'rewards',

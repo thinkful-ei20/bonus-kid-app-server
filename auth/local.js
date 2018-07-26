@@ -11,14 +11,16 @@ const localStrategy = new LocalStrategy((username, password, done) => {
     .populate([{
       path: 'child', 
       model: 'Child', 
-      populate: {
-        path: 'tasks',
-        model: 'Tasks'
-      },
-      populate: {
-        path: 'rewards',
-        model: 'Rewards'
-      }
+      populate: [
+        {
+          path: 'tasks',
+          model: 'Tasks'
+        },        
+        {
+          path: 'rewards',
+          model: 'Rewards'
+        }        
+      ],      
     }, 
     {
       path: 'rewards', 
