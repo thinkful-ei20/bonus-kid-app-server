@@ -357,7 +357,24 @@ router.put('/child/:id', (req, res, next) =>{
       // res.json(result);
       return Child.findByIdAndUpdate(childId, newChild);
     })
-    .then(() => res.json(editedReward))
+    .then(() => {
+      return Child.findById(req.user.id)
+        .populate([{
+          path: 'rewards',
+          model: 'Rewards'        
+        },
+        {
+          path: 'tasks',
+          model: 'Tasks'
+        }
+        ])
+    })
+    .then((result) => {
+      console.log('result:', result);
+      const authToken = createAuthToken(result);
+      return res.send({ authToken });
+    })
+    // .then(() => res.json(editedReward))
     .catch(err => {
       next(err);
     })    
