@@ -281,7 +281,7 @@ router.put('/child/:id', (req,res,next) => {
   if(childComplete){
     updateTask.childComplete = true;
   } 
-
+  updateTask.updatedTime = moment.valueOf();  
   Tasks.findByIdAndUpdate({_id:id, childId}, updateTask, { new: true } )
     .then((result) => {
     //populate the updated child schema 
