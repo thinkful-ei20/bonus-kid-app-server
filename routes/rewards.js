@@ -330,3 +330,51 @@ router.put('/child/:id', (req, res, next) =>{
 });
 
 module.exports = router;
+
+
+
+//DELETE REWARD AS PARENT NEEDS FIX
+
+// router.delete('/:id', (req, res, next) => {
+//   const { id } = req.params;
+//   Rewards.deleteOne({ _id: id, parentId: req.user.id })
+//     // .then(() => Rewards.findById(id))
+//     .then( () => {
+//       let newRewards = req.user.rewards.filter(reward => reward.id === id);
+//       console.log('newRewards', newRewards[0].childId);
+     
+//       return Child.findById({_id:newRewards[0].childId})
+//     })
+//     .then(res => {
+//       console.log('RESSSS',res);
+//       var id = mongoose.Types.ObjectId('4edd40c86762e0fb12000003');
+//       let updateChild = {rewards: [id]}
+//       console.log('UPDATECHILD',updateChild);
+//       return Child.findByIdAndUpdate({id: res.id}, updateChild)
+//     })
+//     .then(() => {
+//     // console.log('before populate', result)
+//       return Parent.findById(req.user.id)
+//         .populate([{
+//           path: 'child',
+//           model: 'Child',
+//           populate:{           
+//               path: 'tasks',
+//               model: 'Tasks'
+//           },
+//         },
+//         {
+//           path: 'rewards',
+//           model: 'Rewards'
+//         }]);
+//     })
+//     .then((result) => {
+//       console.log('result', result);
+//       const authToken = createAuthToken(result);
+//       return res.send({ authToken });
+//     })
+//     .catch(error => {
+//       next(error);
+//     });
+//  });
+ 
