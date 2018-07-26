@@ -24,16 +24,19 @@ function createAuthToken(user) {
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 // ============ Create Reward as Parent ===============
-router.post('/', (req, res, next) => {
+router.post('/:childId', (req, res, next) => {
   let { name, pointValue, purchased, day, hour } = req.body;
+  let {childId} = req.params;
   const { id } = req.user;
   let updatedRewards;
   let rewardTest;
+  let updateChildRewards;
   if (!day) day = 0;
   if (!hour) hour = 0;
   let updateParent = {};
   Rewards.create({
     parentId: id,
+    childId,
     name,
     pointValue,
     purchased,
@@ -47,9 +50,20 @@ router.post('/', (req, res, next) => {
 
       // .catch((err) => console.log(err));
     })
-    .then(parent => {
-      console.log('after reward => ', rewardTest);
-      updatedRewards = { rewards: [...parent.rewards, rewardTest.id] };
+    .then(child => {
+      updateChildRewards = { rewards: [...child.rewards, rewardTest.id] };
+      // updateParent.rewards = updatedRewards;
+      console.log('updatedRewards', updatedRewards);
+      console.log(true);
+      return;
+    })
+    .then(() => {
+      return Child.findByIdAndUpdate(childId, updateChildRewards);
+    })
+    .then(() => {
+      console.log('parent ', req.user.rewards);
+      let rewardsIds = req.user.rewards.map((reward) => reward.id);
+      updatedRewards = { rewards: [...rewardsIds, rewardTest.id] };
       // updateParent.rewards = updatedRewards;
       console.log('updatedRewards', updatedRewards);
       console.log(true);
@@ -67,6 +81,10 @@ router.post('/', (req, res, next) => {
           populate: {
             path: 'tasks',
             model: 'Tasks'
+          },
+          populate: {
+            path: 'rewards',
+            model: 'Rewards'
           }
         },
         {
