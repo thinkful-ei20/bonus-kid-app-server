@@ -10,6 +10,8 @@ const Tasks = require('../models/tasks');
 
 const createAuthToken = require('../helper/createAuthToken');
 const checkError = require('../helper/checkErrors');
+const missingField = require('../helper/missingFields');
+
 const router = express.Router();
 
 /* =================================================================================== */
@@ -138,14 +140,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 // ================ Create a Child User as a Parent =====================
 router.post('/child', (req, res, next) => {
-  const requiredFields = ['username', 'password'];
-  const missingField = requiredFields.find(field => !(field in req.body));
-
-  if (missingField) {
-    const err = new Error(`Missing ${missingField} in request body`);
-    err.status = 422;
-    return next(err);
-  }
+  missingField(['username', 'password'], req);
 
   const stringFields = ['username', 'password'];
   const nonStringField = stringFields.find(field => {
