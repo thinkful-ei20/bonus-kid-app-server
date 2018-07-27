@@ -8,19 +8,12 @@ const Child = require('../models/child');
 const Rewards = require('../models/rewards');
 const Tasks = require('../models/tasks');
 
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRY } = require('../config');
-
+const createAuthToken = require('../helper/createAuthToken');
 const checkError = require('../helper/checkErrors');
 const router = express.Router();
 
 //move to helper folder
-function createAuthToken(user) {
-  return jwt.sign({ user }, JWT_SECRET, {
-    subject: user.username,
-    expiresIn: JWT_EXPIRY
-  });
-}
+
 
 
 
