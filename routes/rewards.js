@@ -10,18 +10,9 @@ const Rewards = require('../models/rewards');
 const Parent = require('../models/parent');
 const Child = require('../models/child');
 
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRY } = require('../config');
-
-//move to helper folder
-function createAuthToken(user) {
-  return jwt.sign({ user }, JWT_SECRET, {
-    subject: user.username,
-    expiresIn: JWT_EXPIRY
-  });
-}
-
 const rewardErrors = require('../helper/rewardErrors');
+const createAuthToken = require('../helper/createAuthToken');
+const populateParent = require('../helper/populateParent');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -76,23 +67,7 @@ router.post('/:childId', (req, res, next) => {
     })
     .then((result) => {
       console.log('before populate', result);
-      return Parent.findById(result.id)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          },
-          populate: {
-            path: 'rewards',
-            model: 'Rewards'
-          }
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      return populateParent(result.id);
     })
     .then((result) => {
       console.log('result', result);
