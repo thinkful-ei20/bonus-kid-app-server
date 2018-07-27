@@ -82,7 +82,7 @@ router.post('/:childId', (req, res, next) => {
 });
 
 // ============ GET Rewards as Parent =============
-
+//Development
 router.get('/', (req, res, next) => {
   const { id } = req.user;
 
@@ -97,22 +97,30 @@ router.get('/', (req, res, next) => {
 
 // ============== Update Reward as Parent ==================
 router.put('/:id', (req, res, next) => {
+  //destructured variables
   const { id } = req.params;
   let { name, pointValue, hour, day } = req.body;
+
+  //convert hour and day to integer
   hour = parseInt(hour);
   day = parseInt(day);
+
+  //creating empty objec
   const updatedReward = {};
 
   if (name) {
     updatedReward.name = name;
   }
+
   if (pointValue) {
     updatedReward.pointValue = pointValue;
   }
+
   if (hour > 0 || day > 0) {
-    console.log('this ran');
     updatedReward.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
   }
+
+  //special code if you send hour and day to zero it resets expiry date
   if (hour === 0 && day === 0) {
     Rewards.findById(id)
       .then(result => updatedReward.expiryDate = result.currentTime)
@@ -120,62 +128,21 @@ router.put('/:id', (req, res, next) => {
         return Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true });
       })
       .then((result) => {
-        console.log('before populate', result);
-        return Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate:[ 
-              {
-                path: 'tasks',
-                model: 'Tasks'
-              },
-              {
-                path: 'rewards',
-                model: 'Rewards'
-              }
-            ],
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }])
+        return populateParent(result.parentId);
       })
       .then((result) => {
-        console.log('result', result);
         const authToken = createAuthToken(result);
         return res.send({ authToken });
       })
       .catch(err => {
         next(err);
       });
-
   } else {
     Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true })
       .then((result) => {
-        console.log('before populate', result);
-        return Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate: [
-              {
-                path: 'tasks',
-                model: 'Tasks'
-              },
-              {
-                path: 'rewards',
-                model: 'Rewards'
-              }
-            ],
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }]);
+        return populateParent(result.parentId);
       })
       .then((result) => {
-        console.log('result', result);
         const authToken = createAuthToken(result);
         return res.send({ authToken });
       })
