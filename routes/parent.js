@@ -132,7 +132,7 @@ router.post('/child', (req, res, next) => {
           return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
         })
         .then(parent => {
-         return populateParent(parent);
+         return populateParent(parent.id);
         })
         .then((result) => {
           const authToken = createAuthToken(result);
@@ -184,25 +184,7 @@ router.delete('/child/:id', (req, res, next) => {
       return Child.find({ _id: id }).remove();
     })
     .then(() => {
-      return Parent.findById(req.user.id)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: [
-            {
-              path: 'tasks',
-              model: 'Tasks'
-            },        
-            {
-              path: 'rewards',
-              model: 'Rewards'
-            }        
-          ],
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      return populateParent(req.user.id);
     })
     .then((result) => {
       const authToken = createAuthToken(result);

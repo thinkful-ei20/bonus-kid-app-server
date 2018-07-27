@@ -2,8 +2,8 @@
 
 const Parent = require('../models/parent');
 
-module.exports = function populateParent(parent){
-  return Parent.findById(parent.id)
+module.exports = function populateParent(id){
+  return Parent.findById(id)
             .populate([{
               path: 'child',
               model: 'Child',
