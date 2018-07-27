@@ -13,6 +13,7 @@ const checkError = require('../helper/checkErrors');
 const missingField = require('../helper/missingFields');
 const nonStringField = require('../helper/nonStringFields');
 const trimmedFields = require('../helper/trimmedFields');
+const tooBigOrTooSmall = require('../helper/tooBigOrTooSmall');
 
 const router = express.Router();
 
@@ -148,35 +149,8 @@ router.post('/child', (req, res, next) => {
 
   trimmedFields(['username', 'password'],req);
 
-  const sizedFields = {
-    username: { min: 1 },
-    password: { min: 8, max: 72 }
-  };
-
-  const tooSmall = Object.keys(sizedFields).find(field => {
-    'min' in sizedFields[field]
-      &&
-      req.body[field].trim().length < sizedFields[field].min;
-  });
-  if (tooSmall) {
-    const min = sizedFields[tooSmall].min;
-    const err = new Error(`Field: '${tooSmall}' must be at least ${min} characters long`);
-    err.status = 422;
-    return next(err);
-  }
-
-  const tooLarge = Object.keys(sizedFields).find(field => {
-    'max' in sizedFields[field]
-      &&
-      req.body[field].trim().length > sizedFields[field].max;
-  });
-  if (tooLarge) {
-    const max = sizedFields[tooLarge].max;
-    const err = new Error(`Field: '${tooLarge}' must be at most ${max} characters long `);
-    err.status = 422;
-    return next(err);
-  }
-
+  tooBigOrTooSmall(req);
+  
   // Create the new user
   const { username, password, name, email } = req.body;
   const userId = req.user.id;
