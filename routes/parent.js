@@ -12,12 +12,6 @@ const createAuthToken = require('../helper/createAuthToken');
 const checkError = require('../helper/checkErrors');
 const router = express.Router();
 
-//move to helper folder
-
-
-
-
-
 /* =================================================================================== */
 //  ================= Create New Parent User =====================
 
@@ -133,19 +127,7 @@ router.get('/', (req, res, next) => {
     path: 'rewards',
     model: 'Rewards'
   }])
-    // .populate({
-    //   path: 'rewards', 
-    //   model: 'Rewards', 
-    // }).lean()
     .then(result => res.json(result));
-  // Parent.find()
-  //   .then(user => {
-  //     res.json(user);
-  //   })
-  //   .catch(err => {
-  //     console.error(err);
-  //     next(err);
-  //   });
 });
 
 /* ==================================================================================== */
