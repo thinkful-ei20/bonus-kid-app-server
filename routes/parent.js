@@ -11,6 +11,7 @@ const Tasks = require('../models/tasks');
 const createAuthToken = require('../helper/createAuthToken');
 const checkError = require('../helper/checkErrors');
 const missingField = require('../helper/missingFields');
+const nonStringField = require('../helper/nonStringFields');
 
 const router = express.Router();
 
@@ -142,16 +143,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 router.post('/child', (req, res, next) => {
   missingField(['username', 'password'], req);
 
-  const stringFields = ['username', 'password'];
-  const nonStringField = stringFields.find(field => {
-    field in req.body && typeof req.body[field] !== 'string';
-  });
-
-  if (nonStringField) {
-    const err = new Error(`Field: '${nonStringField}' must be typeof String`);
-    err.status = 422;
-    return next(err);
-  }
+  nonStringField(req);
 
   const trimmedFields = ['username', 'password'];
   const nonTrimmedField = trimmedFields.find(field => {
