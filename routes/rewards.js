@@ -18,63 +18,64 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 // ============ Create Reward as Parent ===============
 router.post('/:childId', (req, res, next) => {
+  //destructured variables
   let { name, pointValue, purchased, day, hour } = req.body;
   let {childId} = req.params;
   const { id } = req.user;
+
+  //initializing variable for use in promises
   let updatedRewards;
   let rewardTest;
   let updateChildRewards;
+  
   if (!day) day = 0;
   if (!hour) hour = 0;
-  let updateParent = {};
+
+  //create new reward
   Rewards.create({
     parentId: id,
     childId,
     name,
     pointValue,
     purchased,
-    currentTime: moment().valueOf(),
-    expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf()
+    currentTime: moment().valueOf(), //giving the current time 
+    expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf()// creating expiry date if applied
   })
     .then(reward => {
-      console.log('reward =>>', reward);
+      //assign rewardTest to the returned value
       rewardTest = reward;
       return Parent.findById(id);
-
-      // .catch((err) => console.log(err));
     })
     .then(child => {
+      //assign updateChildRewards with the new updated reward array
       updateChildRewards = { rewards: [...child.rewards, rewardTest.id] };
-      // updateParent.rewards = updatedRewards;
-      console.log('updatedRewards', updatedRewards);
-      console.log(true);
       return;
     })
     .then(() => {
+      //update the child with the reward array
       return Child.findByIdAndUpdate(childId, updateChildRewards);
     })
     .then(() => {
-      console.log('parent ', req.user.rewards);
+      //assign rewardIds with the rewards id of the parent
       let rewardsIds = req.user.rewards.map((reward) => reward.id);
       updatedRewards = { rewards: [...rewardsIds, rewardTest.id] };
-      // updateParent.rewards = updatedRewards;
-      console.log('updatedRewards', updatedRewards);
-      console.log(true);
       return;
     })
     .then(() => {
+      //update the parent rewards with the new rewards array
       return Parent.findByIdAndUpdate({ _id: id }, updatedRewards, { new: true });
     })
     .then((result) => {
-      console.log('before populate', result);
+      //populate the parent with new data
       return populateParent(result.id);
     })
     .then((result) => {
-      console.log('result', result);
+      //create authToken with the result and send back
       const authToken = createAuthToken(result);
       return res.send({ authToken });
     })
     .catch(err => {
+      //catch any errors look in helpers folder
       let error = rewardErrors(err);
       next(error);
     });
