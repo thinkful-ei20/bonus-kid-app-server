@@ -21,70 +21,13 @@ const router = express.Router();
 //  ================= Create New Parent User =====================
 
 router.post('/', (req, res, next) => {
-  const requiredFields = ['username', 'password', 'email'];
-  const missingField = requiredFields.find(field => !(field in req.body));
+  missingField(['username', 'password'], req);
 
-  if (missingField) {
-    const err = new Error(`Missing ${missingField} in request body`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
+  nonStringField(req);
 
-  const stringFields = ['username', 'password'];
-  const nonStringField = stringFields.find(field => {
-    field in req.body && typeof req.body[field] !== 'string';
-  });
+  trimmedFields(['username', 'password'],req);
 
-  if (nonStringField) {
-    const err = new Error(`Field: '${nonStringField}' must be typeof String`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
-
-  const trimmedFields = ['username', 'password'];
-  const nonTrimmedField = trimmedFields.find(field => {
-    req.body[field].trim() !== req.body[field];
-  });
-
-  if (nonTrimmedField) {
-    const err = new Error(`Field: '${nonTrimmedField}' cannot start or end with a whitespace!`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
-
-  const sizedFields = {
-    username: { min: 1 },
-    password: { min: 8, max: 72 }
-  };
-
-  const tooSmall = Object.keys(sizedFields).find(field => {
-    'min' in sizedFields[field]
-      &&
-      req.body[field].trim().length < sizedFields[field].min;
-  });
-  if (tooSmall) {
-    const min = sizedFields[tooSmall].min;
-    const err = new Error(`Field: '${tooSmall}' must be at least ${min} characters long`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
-
-  const tooLarge = Object.keys(sizedFields).find(field => {
-    'max' in sizedFields[field]
-      &&
-      req.body[field].trim().length > sizedFields[field].max;
-  });
-  if (tooLarge) {
-    const max = sizedFields[tooLarge].max;
-    const err = new Error(`Field: '${tooLarge}' must be at most ${max} characters long `);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
+  tooBigOrTooSmall(req);
 
   // Create new Parent in DB
   let { username, password, name, email, isParent } = req.body;
@@ -150,7 +93,7 @@ router.post('/child', (req, res, next) => {
   trimmedFields(['username', 'password'],req);
 
   tooBigOrTooSmall(req);
-  
+
   // Create the new user
   const { username, password, name, email } = req.body;
   const userId = req.user.id;
