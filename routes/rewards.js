@@ -156,17 +156,14 @@ router.put('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params;
-  // console.log(req.user);
+
   let rewardInfo;
   Rewards.findById(id)
     .then(reward => {
       rewardInfo = reward;
-      // console.log(rewardInfo.childId);
-      // res.json(rewardInfo);
       return Child.findById(rewardInfo.childId);
     })
     .then(child => {
-      console.log(child);
       let newRewards = child.rewards.filter(reward => reward.id === id);
       return Child.findByIdAndUpdate(child.id, {rewards: newRewards});
     })
@@ -174,22 +171,7 @@ router.delete('/:id', (req, res, next) => {
       return Rewards.deleteOne({ _id: id, parentId: req.user.id });
     })
     .then(() => {
-      return Parent.findById(req.user.id)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate:[{           
-            path: 'tasks',
-            model: 'Tasks'
-          }, {
-            path: 'rewards',
-            model: 'Rewards'
-          }],
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      return populateParent(req.user.id);
     })
     .then((result) => {
       res.json(result);
