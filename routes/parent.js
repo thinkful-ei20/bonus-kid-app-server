@@ -21,6 +21,29 @@ function createAuthToken(user) {
   });
 }
 
+function checkError(err){
+  if(err.code === 11000) {
+    err = new Error('The username already exists');
+    err.status = 400;
+    return err;
+  }
+  if (err.message === 'Parent validation failed: name: Path `name` is required.') {
+    err = new Error('name is required');
+    err.status = 400;
+    return err;
+  }
+  if (err.message === 'Child validation failed: name: Path `name` is required.') {
+    err = new Error('name is required');
+    err.status = 400;
+    return err;
+  }
+  if (err.message === 'Cast to ObjectId failed for value "5b5a309116e7f2763990427f4" at path "_id" for model "Child"') {
+    err = new Error('invalid id');
+    err.status = 400;
+    return err;
+  }
+}
+
 
 /* =================================================================================== */
 //  ================= Create New Parent User =====================
@@ -111,16 +134,8 @@ router.post('/', (req, res, next) => {
         .json(result);
     })
     .catch(err => {
-      if (err.code === 11000) {
-        err = new Error('The username already exists');
-        err.status = 400;
-      }
-      if (err.message === 'Parent validation failed: name: Path `name` is required.') {
-        err = new Error('name is required');
-        err.status = 400;
-      }
-      console.error(err);
-      next(err);
+      let checkErrorAnswer = checkError(err);
+      next(checkErrorAnswer);
     });
 });
 
@@ -174,7 +189,6 @@ router.post('/child', (req, res, next) => {
   if (missingField) {
     const err = new Error(`Missing ${missingField} in request body`);
     err.status = 422;
-    console.error(err);
     return next(err);
   }
 
@@ -186,7 +200,6 @@ router.post('/child', (req, res, next) => {
   if (nonStringField) {
     const err = new Error(`Field: '${nonStringField}' must be typeof String`);
     err.status = 422;
-    console.error(err);
     return next(err);
   }
 
@@ -198,7 +211,6 @@ router.post('/child', (req, res, next) => {
   if (nonTrimmedField) {
     const err = new Error(`Field: '${nonTrimmedField}' cannot start or end with a whitespace!`);
     err.status = 422;
-    console.error(err);
     return next(err);
   }
 
@@ -216,7 +228,6 @@ router.post('/child', (req, res, next) => {
     const min = sizedFields[tooSmall].min;
     const err = new Error(`Field: '${tooSmall}' must be at least ${min} characters long`);
     err.status = 422;
-    console.error(err);
     return next(err);
   }
 
@@ -229,13 +240,12 @@ router.post('/child', (req, res, next) => {
     const max = sizedFields[tooLarge].max;
     const err = new Error(`Field: '${tooLarge}' must be at most ${max} characters long `);
     err.status = 422;
-    console.error(err);
     return next(err);
   }
 
   // Create the new user
   const { username, password, name, email } = req.body;
-  const userId = req.user.id
+  const userId = req.user.id;
 
   return Child.hashPassword(password)
     .then(digest => {
@@ -260,7 +270,6 @@ router.post('/child', (req, res, next) => {
           return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
         })
         .then(parent => {
-          console.log(parent);
           Parent.findById(parent.id)
             .populate([{
               path: 'child',
@@ -281,35 +290,22 @@ router.post('/child', (req, res, next) => {
               model: 'Rewards'
             }])
             .then((result) => {
-              console.log('1', result);
               const authToken = createAuthToken(result);
               res.json({ authToken });
-            })
+            });
         });
-
-
     })
     .catch(err => {
-      if (err.code === 11000) {
-        err = new Error('The username already exists');
-        err.status = 400;
-      }
-      if (err.message === 'Child validation failed: name: Path `name` is required.') {
-        err = new Error('name is required');
-        err.status = 400;
-      }
-      console.error(err);
-      next(err);
+      let checkErrorAnswer = checkError(err);
+      next(checkErrorAnswer);
     });
 });
 
 /* =================================================================================== */
 // DELETE A PARENT BY IDS
 router.delete('/', (req, res, next) => {
-  console.log(req.user);
   Parent.findById(req.user.id)
     .then((result) => {
-      console.log(result);
       // find and remove all associated Tasks
       return Tasks.find({ parentId: req.user.id }).remove();
     })
@@ -327,31 +323,9 @@ router.delete('/', (req, res, next) => {
       res.status(204).end();
     })
     .catch(err => {
-      if (err.value === 'child') {
-        let error = new Error('invalid id');
-        error.status = 400;
-        next(error);
-      }
-      console.error(err.message);
-      next(err);
+      let checkErrorAnswer = checkError(err);
+      next(checkErrorAnswer);
     });
-
-  // Parent.findOneAndRemove({ _id: id })
-  //   .then(() => {
-  //     res.json({
-  //       message: 'Deleted parent user'
-  //     });
-  //     res.status(204).end();
-  //   })
-  //   .catch(err => {
-  //     if(err.value === 'child'){
-  //       let error = new Error('invalid id');
-  //       error.status = 400;
-  //       next(error);
-  //     }
-  //     console.error(err.message);
-  //     next(err);
-  //   });
 });
 
 // ============== Delete a Child as a Parent =================
@@ -360,7 +334,6 @@ router.delete('/child/:id', (req, res, next) => {
 
   Child.find({ _id: id })
     .then((result) => {
-      console.log(result);
       return Tasks.find({ childId: id }).remove();
     })
     .then(() => {
@@ -388,35 +361,13 @@ router.delete('/child/:id', (req, res, next) => {
         }]);
     })
     .then((result) => {
-      console.log('result', result);
       const authToken = createAuthToken(result);
       return res.send({ authToken });
     })
     .catch(err => {
-      if (err.value === 'child') {
-        let error = new Error('invalid id');
-        error.status = 400;
-        next(error);
-      }
-      console.error(err.message);
-      next(err);
+      let checkErrorAnswer = checkError(err);
+      next(checkErrorAnswer);
     });
-  // Child.findOneAndRemove({ _id: id })
-  //   .then(() => {
-  //     res.json({
-  //       message: 'Deleted child user'
-  //     });
-  //     res.status(204).end();
-  //   })
-  //   .catch(err => {
-  //     if (err.value === 'child') {
-  //       let error = new Error('invalid id');
-  //       error.status = 400;
-  //       next(error);
-  //     }
-  //     console.error(err.message);
-  //     next(err);
-  //   });
 });
 
 module.exports = router;
