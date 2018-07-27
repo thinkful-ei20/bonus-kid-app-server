@@ -21,6 +21,8 @@ function createAuthToken(user) {
   });
 }
 
+const rewardErrors = require('../helper/rewardErrors');
+
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 // ============ Create Reward as Parent ===============
@@ -98,24 +100,8 @@ router.post('/:childId', (req, res, next) => {
       return res.send({ authToken });
     })
     .catch(err => {
-      console.log(err);
-      if (err.code === 11000) {
-        let error = new Error('Same name for reward');
-        error.status = 400;
-        next(error);
-      }
-      if (err.message === 'Rewards validation failed: name: Path `name` is required.') {
-        let error = new Error('name is required');
-        error.status = 400;
-        next(error);
-      }
-      if (err.message === 'Rewards validation failed: pointValue: Path `pointValue` is required.') {
-        let error = new Error('pointValue are required');
-        error.status = 400;
-        next(error);
-      }
-
-      next(err);
+      let error = rewardErrors(err);
+      next(error);
     });
 });
 
