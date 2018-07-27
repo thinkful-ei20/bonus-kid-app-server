@@ -14,6 +14,8 @@ const missingField = require('../helper/missingFields');
 const nonStringField = require('../helper/nonStringFields');
 const trimmedFields = require('../helper/trimmedFields');
 const tooBigOrTooSmall = require('../helper/tooBigOrTooSmall');
+const populateParent = require('../helper/populateParent');
+
 
 const router = express.Router();
 
@@ -21,12 +23,17 @@ const router = express.Router();
 //  ================= Create New Parent User =====================
 
 router.post('/', (req, res, next) => {
+
+  //checks for any missing fields
   missingField(['username', 'password'], req);
 
+  //checks to see if username and pass are not strings
   nonStringField(req);
 
+  //removes white space
   trimmedFields(['username', 'password'],req);
 
+  //checks username and password character lengths
   tooBigOrTooSmall(req);
 
   // Create new Parent in DB
@@ -86,12 +93,16 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 // ================ Create a Child User as a Parent =====================
 router.post('/child', (req, res, next) => {
+  //checks for any missing fields
   missingField(['username', 'password'], req);
 
+  //checks to see if username and pass are not strings
   nonStringField(req);
 
+  //removes white space
   trimmedFields(['username', 'password'],req);
 
+  //checks username and password character lengths
   tooBigOrTooSmall(req);
 
   // Create the new user
@@ -121,29 +132,11 @@ router.post('/child', (req, res, next) => {
           return Parent.findByIdAndUpdate(userId, updateParent, { new: true })
         })
         .then(parent => {
-          Parent.findById(parent.id)
-            .populate([{
-              path: 'child',
-              model: 'Child',
-              populate: [
-                {
-                  path: 'tasks',
-                  model: 'Tasks'
-                },        
-                {
-                  path: 'rewards',
-                  model: 'Rewards'
-                }        
-              ],
-            },
-            {
-              path: 'rewards',
-              model: 'Rewards'
-            }])
-            .then((result) => {
-              const authToken = createAuthToken(result);
-              res.json({ authToken });
-            });
+         return populateParent(parent);
+        })
+        .then((result) => {
+          const authToken = createAuthToken(result);
+          res.json({ authToken });
         });
     })
     .catch(err => {
