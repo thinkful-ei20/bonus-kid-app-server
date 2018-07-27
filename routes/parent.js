@@ -12,6 +12,7 @@ const createAuthToken = require('../helper/createAuthToken');
 const checkError = require('../helper/checkErrors');
 const missingField = require('../helper/missingFields');
 const nonStringField = require('../helper/nonStringFields');
+const trimmedFields = require('../helper/trimmedFields');
 
 const router = express.Router();
 
@@ -145,16 +146,7 @@ router.post('/child', (req, res, next) => {
 
   nonStringField(req);
 
-  const trimmedFields = ['username', 'password'];
-  const nonTrimmedField = trimmedFields.find(field => {
-    req.body[field].trim() !== req.body[field];
-  });
-
-  if (nonTrimmedField) {
-    const err = new Error(`Field: '${nonTrimmedField}' cannot start or end with a whitespace!`);
-    err.status = 422;
-    return next(err);
-  }
+  trimmedFields(['username', 'password'],req);
 
   const sizedFields = {
     username: { min: 1 },
