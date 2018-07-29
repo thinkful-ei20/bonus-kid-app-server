@@ -79,16 +79,11 @@ router.put('/:id', (req, res, next) => {
   const updatedTask = {};
 
   //adds any values if they are sent to the updatedTask object
-  if(name){
-    updatedTask.name = name;
-  }
-  if (pointValue){
-    updatedTask.pointValue = pointValue;
-  } 
-  if (hour > 0 || day > 0) {
-    console.log('this ran');
-    updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
-  }
+  if(name) updatedTask.name = name;
+
+  if (pointValue) updatedTask.pointValue = pointValue;
+  
+  if (hour > 0 || day > 0) updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
 
   // ================== Approve Task =====================
   if(complete === true){
