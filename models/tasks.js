@@ -12,8 +12,8 @@ const tasksSchema = mongoose.Schema({
   childComplete: {type: Boolean, default: false},
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   expiryDate: {type: String, require:true, default: ''},
-  currentTime: {type: String, require: true, default: ''} 
-
+  currentTime: {type: String, require: true, default: ''}, 
+  updatedTime: {type: String, require: true, default: null}
 }, {timestamps: true});
 
 tasksSchema.set('toObject', {

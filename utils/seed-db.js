@@ -85,8 +85,6 @@ mongoose.connect(DATABASE_URL)
       })
   })
 
-
-
   .then(() => {
     seedChild.forEach((child,i) => child.tasks = [taskIds[i]]);
     return Child.findOneAndUpdate({_id:childIds[0]},seedChild[0])
@@ -94,10 +92,6 @@ mongoose.connect(DATABASE_URL)
   .then(() => Child.findOneAndUpdate({_id:childIds[1]},seedChild[1]))
   .then(() => Child.findOneAndUpdate({_id:childIds[2]},seedChild[2]))
   .then(() => Child.findOneAndUpdate({_id:childIds[3]},seedChild[3]))
-
-
-
-
 
   .then(() => {
     seedParent.forEach((parent,i) => parent.child = [childIds[i]]);
@@ -111,6 +105,15 @@ mongoose.connect(DATABASE_URL)
   .then(() => Parent.findByIdAndUpdate(parentIds[2], {rewards: rewardIds[2]}))
   .then(() => Parent.findByIdAndUpdate(parentIds[3], {rewards: rewardIds[3]}))
 
+  .then(() => Rewards.findByIdAndUpdate(rewardIds[0], {childId: childIds[0]}))
+  .then(() => Rewards.findByIdAndUpdate(rewardIds[1], {childId: childIds[1]}))
+  .then(() => Rewards.findByIdAndUpdate(rewardIds[2], {childId: childIds[2]}))
+  .then(() => Rewards.findByIdAndUpdate(rewardIds[3], {childId: childIds[3]}))
+
+  .then(() => Child.findByIdAndUpdate(childIds[0], {rewards: [rewardIds[0]]}))
+  .then(() => Child.findByIdAndUpdate(childIds[1], {rewards: [rewardIds[1]]}))
+  .then(() => Child.findByIdAndUpdate(childIds[2], {rewards: [rewardIds[2]]}))
+  .then(() => Child.findByIdAndUpdate(childIds[3], {rewards: [rewardIds[3]]}))
 
 
 

@@ -11,51 +11,22 @@ const Child = require('../models/child');
 const Parent = require('../models/parent');
 
 
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRY } = require('../config');
-
-//move to helper folder
-function createAuthToken(user) {
-  return jwt.sign({ user }, JWT_SECRET, {
-    subject: user.username,
-    expiresIn: JWT_EXPIRY
-  });
-}
-
+const createAuthToken = require('../helper/createAuthToken');
+const missingField = require('../helper/missingFields');
+const nonStringField = require('../helper/nonStringFields');
+const populateParent = require('../helper/populateParent');
+const populateChild = require('../helper/populateChild');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 // ============ Create Task as Parent =================
 
 router.post('/:childId', (req, res, next) => {
-  const requiredFields = ['name', 'pointValue'];
-
   const parentId = req.user.id; // current signed in Parent
 
   const { childId } = req.params;
-  console.log('childId',childId);
   
-
-  const missingField = requiredFields.find(field => !(field in req.body));
-
-  if (missingField) {
-    const err = new Error(`Missing ${missingField} in request body`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
-
-  const stringFields = ['username'];
-  const nonStringField = stringFields.find(field => {
-    field in req.body && typeof req.body[field] !== 'string';
-  });
-
-  if (nonStringField) {
-    const err = new Error(`Field: '${nonStringField}' must be typeof String`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
+  missingField(['name', 'pointValue'],req);
 
   // Create new task update in DB
   let { name, pointValue, day, hour } = req.body;
@@ -63,6 +34,8 @@ router.post('/:childId', (req, res, next) => {
   if (!hour) hour = 0;
   let updateChildTasks;
   let newTaskId;
+
+  //creates a new task object with times if they are sent else it will be default with the same valas currentTime
   const newTask = {
     name,
     pointValue,
@@ -71,45 +44,26 @@ router.post('/:childId', (req, res, next) => {
     expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf(),
     childId: [childId]
   };
+
   return Tasks.create(newTask)
     .then(result => {
       newTaskId = result.id;
       return Child.findById(childId);  
     })
     .then((result) => {
-      console.log('result After creating task',result);
       updateChildTasks = {tasks: [...result.tasks ,newTaskId]};
-      console.log('update',updateChildTasks);
       return;
     })
     .then(() => {
       return Child.findByIdAndUpdate(childId, updateChildTasks, {new: true});
     })
     .then((result) => {
-      return Parent.findById(result.parentId)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          }
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      return populateParent(result.parentId);
     })
     .then((result) => {
-      // console.log('1', result);
       const authToken = createAuthToken(result);
       res.json({ authToken });
     })
-
-    
-    // return res.status(201)
-    //     .location(`${req.originalUrl}/${result.id}`)
-    //     .json(result);
     .catch(err => {
       next(err);
     });
@@ -117,64 +71,47 @@ router.post('/:childId', (req, res, next) => {
 
 // ========== Update Task as Parent ================
 router.put('/:id', (req, res, next) => {
+  //destructure and initialize vars
   const { id } = req.params;
   let { name, pointValue, hour, day, complete } = req.body;
   hour = parseInt(hour);
   day = parseInt(day);
   const userId = req.user.id;
-  console.log(id);
   const updatedTask = {};
-  if(name){
-    updatedTask.name = name;
-  }
-  if (pointValue){
-    updatedTask.pointValue = pointValue;
-  } 
-  if (hour > 0 || day > 0) {
-    console.log('this ran');
-    updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
-  }
+
+  //adds any values if they are sent to the updatedTask object
+  if(name) updatedTask.name = name;
+
+  if (pointValue) updatedTask.pointValue = pointValue;
+
+  if (hour > 0 || day > 0) updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
+
   // ================== Approve Task =====================
   if(complete === true){
+    //set the updatedTask obj to true
     updatedTask.complete = true;
     let returnResult;
+
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
+        //set returnResult to result
         returnResult = result;
-        // console.log(result);
         return Child.findById(result.childId);
-        // res.json(result);
       })
       .then(result => {
-        console.log(returnResult);
         let updatedScore = {};
+        // add points to current points and total points
         updatedScore.currentPoints = parseInt(returnResult.pointValue) + parseInt(result.currentPoints);
         updatedScore.totalPoints = parseInt(returnResult.pointValue) + parseInt(result.totalPoints);
 
-        console.log('updatedScore', updatedScore, updatedTask.pointValue, result.currentPoints);
-        console.log('hey',result);
-        return  Child.findByIdAndUpdate({_id: result.id}, updatedScore, {new: true});
+        return Child.findByIdAndUpdate({_id: result.id}, updatedScore, {new: true});
       })
       .then(result => {
-        console.log('parentId', result.parentId);
-        Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }])
-          .then((result) => {
-            console.log('1', result);
-            const authToken = createAuthToken(result);
-            res.json({ authToken });
-          });
+        return populateParent(result.parentId);
+      })
+      .then((result) => {
+        const authToken = createAuthToken(result);
+        res.json({ authToken });
       })
       .catch(err => {
         next(err);
@@ -182,40 +119,30 @@ router.put('/:id', (req, res, next) => {
   }  
   // =============== Reject Task Approve Request ==========================
   else if (complete === false){
+    //rejects task and subtracts points for current points and total points
     updatedTask.complete = false;
     let returnResult;
+
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
+        //set returnResult to result
         returnResult = result;
         return Child.findById(result.childId);
       })
       .then(result => {
         let updatedScore = {};
+        // subtract points to current points and total points
         updatedScore.currentPoints = parseInt(result.currentPoints) - parseInt(returnResult.pointValue);
         updatedScore.totalPoints = parseInt(result.totalPoints) - parseInt(returnResult.pointValue);
 
         return  Child.findByIdAndUpdate({_id: result.id}, updatedScore, {new: true});
       })
       .then(result => {
-        console.log('parentId', result.parentId);
-        Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }])
-          .then((result) => {
-            console.log('1', result);
-            const authToken = createAuthToken(result);
-            res.json({ authToken });
-          })
+        return populateParent(result.parentId);  
+      })
+      .then((result) => {
+        const authToken = createAuthToken(result);
+        res.json({ authToken });
       })
       .catch(err => {
         next(err);
@@ -224,12 +151,17 @@ router.put('/:id', (req, res, next) => {
   // =========== Reseting the Expire Date =========== 
   //If hour and day === 0 the expire date is reset to current time
   else if (hour === 0 && day === 0) {
+    //resets time
     Tasks.findById(id)
       .then(result => updatedTask.expiryDate = result.currentTime)
       .then(() => {
         return Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
           .then(result => {
-            res.json(result);
+            return populateParent(result.parentId);
+          })
+          .then((result) => {
+            const authToken = createAuthToken(result);
+            res.json({ authToken });
           })
           .catch(err => {
             next(err);
@@ -237,32 +169,17 @@ router.put('/:id', (req, res, next) => {
       });
   } 
   // ============ Normal Update: name/pointValue/expireDate =================
-
   else {
+    //if it doesnt reset the time or check to see if its complete it runs
+    //it updates name pointValue and expiry date
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then((result) => {
         //populate the updated parent schema
-        return Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }]);
+        return populateParent(result.parentId);
       })
       .then((result) => {
-      // console.log('1', result);
         const authToken = createAuthToken(result);
         res.json({ authToken });
-      })
-      .then(result => {
-        res.json(result);
       })
       .catch(err => {
         next(err);
@@ -271,6 +188,8 @@ router.put('/:id', (req, res, next) => {
 });
 
 // ========= Child Update Task, Submit for Approval ==============
+      // make TWILIO call here to  parent about childComplete
+      // make TWILIO call here to  parent about childComplete
 
 router.put('/child/:id', (req,res,next) => {
   const { id } = req.params;
@@ -278,72 +197,27 @@ router.put('/child/:id', (req,res,next) => {
   const updateTask = {};
   const childId = req.user.id;
 
+  //if childComplete set the childComplete prop of the obj to true
   if(childComplete){
     updateTask.childComplete = true;
   } 
 
+  //set updatedTime to epoch time of the current time
+  updateTask.updatedTime = moment().valueOf();  
+
   Tasks.findByIdAndUpdate({_id:id, childId}, updateTask, { new: true } )
     .then((result) => {
     //populate the updated child schema 
-      return Child.findById(result.childId)
-        .populate({ 
-          path: 'tasks',
-          model: 'Tasks'
-        })
-        .then((result) => {
-          const authToken = createAuthToken(result);
-          res.json({ authToken });
-        })
-        .then(result => {
-          res.json(result);
-        })
-        .catch(err => {
-          next(err);
-        });
+    return populateChild(result.childId)
+    })
+    .then((result) => {
+      const authToken = createAuthToken(result);
+      res.json({ authToken });
+    })
+    .catch(err => {
+      next(err);
     });
 });
-
-
-
-
-
-
-// Tasks.findOne({_id:id})
-//   .then((res) => {
-//     console.log('res.parentID',typeof res.parentId);
-//     console.log('userId',typeof userId);
-
-//     if(res.parentId == userId){
-
-//       Tasks.findOneAndUpdate( id, updatedTask )
-//         .then(result => {
-//           if (result) {
-//             res.json(result);
-//           } else {
-//             next();
-//           }
-//         })
-//         .catch(err => {
-//           next(err);
-//         });
-//     } else {
-//       console.log('rehjected');
-
-//       Promise.reject(new Error('you don\'t own this task')).then(res, next);
-//     }
-//   });
-
-// Tasks.findOneAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
-//   .then(result => {
-//     if (result) {
-//       res.json(result);
-//     } else {
-//       next();
-//     }
-//   })
-//   .catch(err => {
-//     next(err);
-//   });
 
 
 // =========== Delete Task as Parent ===================
@@ -353,28 +227,12 @@ router.delete('/:id', (req, res, next) => {
 
   Tasks.findOneAndRemove({ _id: id, parentId })
     .then((result) => {
-    //populate the updated parent schema
-      return Parent.findById(result.parentId)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          }
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      //populate the updated parent schema
+      return populateParent(result.parentId); 
     })
     .then((result) => {
-      // console.log('1', result);
       const authToken = createAuthToken(result);
       res.json({ authToken });
-    })
-    .then(result => {
-      res.json(result);
     })
     .catch(err => {
       next(err);
