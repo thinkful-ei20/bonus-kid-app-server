@@ -92,16 +92,19 @@ router.put('/:id', (req, res, next) => {
 
   // ================== Approve Task =====================
   if(complete === true){
+    //set the updatedTask obj to true
     updatedTask.complete = true;
     let returnResult;
+
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
+        //set returnResult to result
         returnResult = result;
         return Child.findById(result.childId);
       })
       .then(result => {
         let updatedScore = {};
-
+        // add points to current points and total points
         updatedScore.currentPoints = parseInt(returnResult.pointValue) + parseInt(result.currentPoints);
         updatedScore.totalPoints = parseInt(returnResult.pointValue) + parseInt(result.totalPoints);
 
@@ -126,12 +129,13 @@ router.put('/:id', (req, res, next) => {
 
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then(result => {
+        //set returnResult to result
         returnResult = result;
         return Child.findById(result.childId);
       })
       .then(result => {
         let updatedScore = {};
-
+        // subtract points to current points and total points
         updatedScore.currentPoints = parseInt(result.currentPoints) - parseInt(returnResult.pointValue);
         updatedScore.totalPoints = parseInt(result.totalPoints) - parseInt(returnResult.pointValue);
 
