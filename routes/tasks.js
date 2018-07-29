@@ -11,17 +11,9 @@ const Child = require('../models/child');
 const Parent = require('../models/parent');
 
 
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRY } = require('../config');
-
-//move to helper folder
-function createAuthToken(user) {
-  return jwt.sign({ user }, JWT_SECRET, {
-    subject: user.username,
-    expiresIn: JWT_EXPIRY
-  });
-}
-
+const createAuthToken = require('../helper/createAuthToken');
+const missingField = require('../helper/missingFields');
+const nonStringField = require('../helper/nonStringFields');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -33,29 +25,8 @@ router.post('/:childId', (req, res, next) => {
   const parentId = req.user.id; // current signed in Parent
 
   const { childId } = req.params;
-  console.log('childId',childId);
   
-
-  const missingField = requiredFields.find(field => !(field in req.body));
-
-  if (missingField) {
-    const err = new Error(`Missing ${missingField} in request body`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
-
-  const stringFields = ['username'];
-  const nonStringField = stringFields.find(field => {
-    field in req.body && typeof req.body[field] !== 'string';
-  });
-
-  if (nonStringField) {
-    const err = new Error(`Field: '${nonStringField}' must be typeof String`);
-    err.status = 422;
-    console.error(err);
-    return next(err);
-  }
+  missingField(['name', 'pointValue'],req);
 
   // Create new task update in DB
   let { name, pointValue, day, hour } = req.body;
@@ -63,6 +34,8 @@ router.post('/:childId', (req, res, next) => {
   if (!hour) hour = 0;
   let updateChildTasks;
   let newTaskId;
+
+  //creates a new task object with times if they are sent else it will be default with the same valas currentTime
   const newTask = {
     name,
     pointValue,
@@ -71,45 +44,27 @@ router.post('/:childId', (req, res, next) => {
     expiryDate: moment().add(day, 'days').add(hour, 'hours').valueOf(),
     childId: [childId]
   };
+
+
   return Tasks.create(newTask)
     .then(result => {
       newTaskId = result.id;
       return Child.findById(childId);  
     })
     .then((result) => {
-      console.log('result After creating task',result);
       updateChildTasks = {tasks: [...result.tasks ,newTaskId]};
-      console.log('update',updateChildTasks);
       return;
     })
     .then(() => {
       return Child.findByIdAndUpdate(childId, updateChildTasks, {new: true});
     })
     .then((result) => {
-      return Parent.findById(result.parentId)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          }
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      return propulateParent(result.parentId);
     })
     .then((result) => {
-      // console.log('1', result);
       const authToken = createAuthToken(result);
       res.json({ authToken });
     })
-
-    
-    // return res.status(201)
-    //     .location(`${req.originalUrl}/${result.id}`)
-    //     .json(result);
     .catch(err => {
       next(err);
     });
