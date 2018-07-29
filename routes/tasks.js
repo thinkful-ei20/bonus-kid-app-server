@@ -14,6 +14,7 @@ const Parent = require('../models/parent');
 const createAuthToken = require('../helper/createAuthToken');
 const missingField = require('../helper/missingFields');
 const nonStringField = require('../helper/nonStringFields');
+const populateParent = require('../helper/populateParent');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -43,7 +44,6 @@ router.post('/:childId', (req, res, next) => {
     childId: [childId]
   };
 
-
   return Tasks.create(newTask)
     .then(result => {
       newTaskId = result.id;
@@ -57,7 +57,7 @@ router.post('/:childId', (req, res, next) => {
       return Child.findByIdAndUpdate(childId, updateChildTasks, {new: true});
     })
     .then((result) => {
-      return propulateParent(result.parentId);
+      return populateParent(result.parentId);
     })
     .then((result) => {
       const authToken = createAuthToken(result);
@@ -182,7 +182,11 @@ router.put('/:id', (req, res, next) => {
       .then(() => {
         return Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
           .then(result => {
-            res.json(result);
+            return populateParent(result.parentId);
+          })
+          .then((result) => {
+            const authToken = createAuthToken(result);
+            res.json({ authToken });
           })
           .catch(err => {
             next(err);
@@ -190,32 +194,15 @@ router.put('/:id', (req, res, next) => {
       });
   } 
   // ============ Normal Update: name/pointValue/expireDate =================
-
   else {
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
       .then((result) => {
         //populate the updated parent schema
-        return Parent.findById(result.parentId)
-          .populate([{
-            path: 'child',
-            model: 'Child',
-            populate: {
-              path: 'tasks',
-              model: 'Tasks'
-            }
-          },
-          {
-            path: 'rewards',
-            model: 'Rewards'
-          }]);
+        return populateParent(result.parentId);
       })
       .then((result) => {
-      // console.log('1', result);
         const authToken = createAuthToken(result);
         res.json({ authToken });
-      })
-      .then(result => {
-        res.json(result);
       })
       .catch(err => {
         next(err);
