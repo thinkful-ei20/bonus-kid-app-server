@@ -227,28 +227,12 @@ router.delete('/:id', (req, res, next) => {
 
   Tasks.findOneAndRemove({ _id: id, parentId })
     .then((result) => {
-    //populate the updated parent schema
-      return Parent.findById(result.parentId)
-        .populate([{
-          path: 'child',
-          model: 'Child',
-          populate: {
-            path: 'tasks',
-            model: 'Tasks'
-          }
-        },
-        {
-          path: 'rewards',
-          model: 'Rewards'
-        }]);
+      //populate the updated parent schema
+      return populateParent(result.parentId); 
     })
     .then((result) => {
-      // console.log('1', result);
       const authToken = createAuthToken(result);
       res.json({ authToken });
-    })
-    .then(result => {
-      res.json(result);
     })
     .catch(err => {
       next(err);
