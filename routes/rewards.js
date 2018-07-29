@@ -13,6 +13,7 @@ const Child = require('../models/child');
 const rewardErrors = require('../helper/rewardErrors');
 const createAuthToken = require('../helper/createAuthToken');
 const populateParent = require('../helper/populateParent');
+const populateChild = require('../helper/populateChild');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -123,6 +124,7 @@ router.put('/:id', (req, res, next) => {
   //special code if you send hour and day to zero it resets expiry date
   if (hour === 0 && day === 0) {
     Rewards.findById(id)
+      //reset time to when it was created
       .then(result => updatedReward.expiryDate = result.currentTime)
       .then(() => {
         return Rewards.findByIdAndUpdate({ _id: id, parentId: req.user.id }, updatedReward, { new: true });
@@ -155,19 +157,23 @@ router.put('/:id', (req, res, next) => {
 // =========== DELETE Rewards as Parent =====================
 
 router.delete('/:id', (req, res, next) => {
+  //destrute  and initialize vars
   const { id } = req.params;
-
   let rewardInfo;
+
   Rewards.findById(id)
     .then(reward => {
+      //set rewardInfo equal to reward found by id
       rewardInfo = reward;
       return Child.findById(rewardInfo.childId);
     })
     .then(child => {
+      //filter the childs rewards and update
       let newRewards = child.rewards.filter(reward => reward.id === id);
       return Child.findByIdAndUpdate(child.id, {rewards: newRewards});
     })
     .then(() => {
+      //delete the reward
       return Rewards.deleteOne({ _id: id, parentId: req.user.id });
     })
     .then(() => {
@@ -182,7 +188,7 @@ router.delete('/:id', (req, res, next) => {
 
 
 // =========== GET Rewards as Child ==============
-
+//Development
 router.get('/child', (req, res, next) => {
   const { parentId } = req.user;
   console.log('xx', parentId);
@@ -200,20 +206,24 @@ router.get('/child', (req, res, next) => {
 // =========== Purchase Reward as Child ==========
 
 router.put('/child/:id', (req, res, next) =>{
+  //destructure and initialize vars
   const { id } = req.params;
   const childId = req.user.id;
   let editedReward;
-  //reward id
+
   Rewards.findById(id)
     .then(res => {
+      //if reward is already purchased send error
       if(res.purchased === true){
         const error = new Error('Reward already purchased');
         error.status = 400;
         throw next(error);
       }
       else {
+        //update reward by switching boolean value
         let { purchased } = req.body;
         const updateReward = {};
+        //double checks to see if the purchased is true
         if(purchased === true){
           updateReward.purchased = purchased;
         }
@@ -221,28 +231,18 @@ router.put('/child/:id', (req, res, next) =>{
       }
     })
     .then(result => {
+      //set editedReward to the new updated reward
       editedReward = result;
-      console.log('result',result);
+      //update points
       let newChild = {
         currentPoints: req.user.currentPoints - editedReward.pointValue         
       };   
-      // res.json(result);
       return Child.findByIdAndUpdate(childId, newChild);
     })
     .then(() => {
-      return Child.findById(req.user.id)
-        .populate([{
-          path: 'rewards',
-          model: 'Rewards'        
-        },
-        {
-          path: 'tasks',
-          model: 'Tasks'
-        }
-        ])
+      return populateChild(req.user.id);
     })
     .then((result) => {
-      console.log('result:', result);
       const authToken = createAuthToken(result);
       return res.send({ authToken });
     })
