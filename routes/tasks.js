@@ -15,6 +15,7 @@ const createAuthToken = require('../helper/createAuthToken');
 const missingField = require('../helper/missingFields');
 const nonStringField = require('../helper/nonStringFields');
 const populateParent = require('../helper/populateParent');
+const populateChild = require('../helper/populateChild');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -82,7 +83,7 @@ router.put('/:id', (req, res, next) => {
   if(name) updatedTask.name = name;
 
   if (pointValue) updatedTask.pointValue = pointValue;
-  
+
   if (hour > 0 || day > 0) updatedTask.expiryDate = moment().add(day, 'days').add(hour, 'hours').valueOf();
 
   // ================== Approve Task =====================
@@ -196,72 +197,27 @@ router.put('/child/:id', (req,res,next) => {
   const updateTask = {};
   const childId = req.user.id;
 
+  //if childComplete set the childComplete prop of the obj to true
   if(childComplete){
     updateTask.childComplete = true;
   } 
-  updateTask.updatedTime = moment.valueOf();  
+
+  //set updatedTime to epoch time of the current time
+  updateTask.updatedTime = moment().valueOf();  
+
   Tasks.findByIdAndUpdate({_id:id, childId}, updateTask, { new: true } )
     .then((result) => {
     //populate the updated child schema 
-      return Child.findById(result.childId)
-        .populate({ 
-          path: 'tasks',
-          model: 'Tasks'
-        })
-        .then((result) => {
-          const authToken = createAuthToken(result);
-          res.json({ authToken });
-        })
-        .then(result => {
-          res.json(result);
-        })
-        .catch(err => {
-          next(err);
-        });
+    return populateChild(result.childId)
+    })
+    .then((result) => {
+      const authToken = createAuthToken(result);
+      res.json({ authToken });
+    })
+    .catch(err => {
+      next(err);
     });
 });
-
-
-
-
-
-
-// Tasks.findOne({_id:id})
-//   .then((res) => {
-//     console.log('res.parentID',typeof res.parentId);
-//     console.log('userId',typeof userId);
-
-//     if(res.parentId == userId){
-
-//       Tasks.findOneAndUpdate( id, updatedTask )
-//         .then(result => {
-//           if (result) {
-//             res.json(result);
-//           } else {
-//             next();
-//           }
-//         })
-//         .catch(err => {
-//           next(err);
-//         });
-//     } else {
-//       console.log('rehjected');
-
-//       Promise.reject(new Error('you don\'t own this task')).then(res, next);
-//     }
-//   });
-
-// Tasks.findOneAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
-//   .then(result => {
-//     if (result) {
-//       res.json(result);
-//     } else {
-//       next();
-//     }
-//   })
-//   .catch(err => {
-//     next(err);
-//   });
 
 
 // =========== Delete Task as Parent ===================
