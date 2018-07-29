@@ -20,8 +20,6 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 // ============ Create Task as Parent =================
 
 router.post('/:childId', (req, res, next) => {
-  const requiredFields = ['name', 'pointValue'];
-
   const parentId = req.user.id; // current signed in Parent
 
   const { childId } = req.params;
