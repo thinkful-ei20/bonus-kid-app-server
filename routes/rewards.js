@@ -174,7 +174,8 @@ router.delete('/:id', (req, res, next) => {
       return populateParent(req.user.id);
     })
     .then((result) => {
-      res.json(result);
+        const authToken = createAuthToken(result);
+        res.send({ authToken });
     });
 });
 
@@ -245,77 +246,9 @@ router.put('/child/:id', (req, res, next) =>{
       const authToken = createAuthToken(result);
       return res.send({ authToken });
     })
-    // .then(() => res.json(editedReward))
     .catch(err => {
       next(err);
-    })    
-
-  // if (purchased === true){
-  //   const error = new Error('Reward already purchased');
-  //   error.status = 400;
-  //   return next(error);
-
-  // } else if (purchased) {
-  //   updateReward.purchased = purchased;
-  // } 
-
-  // Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
-  //   .then(result => {
-  //     console.log('result',result);
-      
-  //     res.json(result);
-  //   })
-  //   .catch(err => {
-  //     next(err);
-  //   })
+    });
 });
 
 module.exports = router;
-
-
-
-//DELETE REWARD AS PARENT NEEDS FIX
-
-// router.delete('/:id', (req, res, next) => {
-//   const { id } = req.params;
-//   Rewards.deleteOne({ _id: id, parentId: req.user.id })
-//     // .then(() => Rewards.findById(id))
-//     .then( () => {
-//       let newRewards = req.user.rewards.filter(reward => reward.id === id);
-//       console.log('newRewards', newRewards[0].childId);
-     
-//       return Child.findById({_id:newRewards[0].childId})
-//     })
-//     .then(res => {
-//       console.log('RESSSS',res);
-//       var id = mongoose.Types.ObjectId('4edd40c86762e0fb12000003');
-//       let updateChild = {rewards: [id]}
-//       console.log('UPDATECHILD',updateChild);
-//       return Child.findByIdAndUpdate({id: res.id}, updateChild)
-//     })
-//     .then(() => {
-//     // console.log('before populate', result)
-//       return Parent.findById(req.user.id)
-//         .populate([{
-//           path: 'child',
-//           model: 'Child',
-//           populate:{           
-//               path: 'tasks',
-//               model: 'Tasks'
-//           },
-//         },
-//         {
-//           path: 'rewards',
-//           model: 'Rewards'
-//         }]);
-//     })
-//     .then((result) => {
-//       console.log('result', result);
-//       const authToken = createAuthToken(result);
-//       return res.send({ authToken });
-//     })
-//     .catch(error => {
-//       next(error);
-//     });
-//  });
- 
