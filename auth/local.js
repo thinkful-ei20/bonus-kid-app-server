@@ -8,7 +8,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
   // console.log(username);
   User.find({ username })
-    .populate([{
+    .populate({
       path: 'child', 
       model: 'Child', 
       populate: [
@@ -21,11 +21,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           model: 'Rewards'
         }        
       ],      
-    }, 
-    {
-      path: 'rewards', 
-      model: 'Rewards'
-    }])
+    })
     .then(results => {
       // console.log(results);
       user = results[0];
