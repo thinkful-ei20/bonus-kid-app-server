@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = function checkError(err){
+  //add this to an error "E11000 duplicate key error index: bonus-kid.parents.$email_1 dup key: { : \"test1@gmail.com\" }"
   if(err.code === 11000) {
     err = new Error('The username already exists');
     err.status = 400;
