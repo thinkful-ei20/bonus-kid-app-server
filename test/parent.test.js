@@ -24,7 +24,6 @@ describe('Parent User', function() {
 
   const childUser = 'testChld';
   const childPassword = password;
-  const childEmail = 'test1@gmail.com';
   const childName = 'test';
 
   before(function() {
@@ -145,7 +144,6 @@ describe('Parent User', function() {
           })
           .then((res) => {
             authToken = res.body.authToken;
-            // console.log(authToken);
             return chai
               .request(app)  
               .post('/api/parent/child')
@@ -182,7 +180,6 @@ describe('Parent User', function() {
           })
           .then((res) => {
             authToken = res.body.authToken;
-            // console.log(authToken);
             return chai
               .request(app)  
               .post('/api/parent/child')
@@ -215,7 +212,6 @@ describe('Parent User', function() {
           })
           .then((res) => {
             authToken = res.body.authToken;
-            // console.log(authToken);
             return chai
               .request(app)  
               .post('/api/parent/child')
@@ -248,7 +244,6 @@ describe('Parent User', function() {
           })
           .then((res) => {
             authToken = res.body.authToken;
-            // console.log(authToken);
             return chai
               .request(app)  
               .post('/api/parent/child')
@@ -266,6 +261,40 @@ describe('Parent User', function() {
     });
   });
 
-  
+  describe('Delete /api/parent', function (){
+    describe('Delete Parent', function() {
+      it('Should delete a user', function() {
+        let authToken;
+        return chai
+          .request(app)
+          .post('/api/parent')
+          .send({ username, password , email, name})
+          .then(() => {
+            return chai
+              .request(app)
+              .post('/api/login')
+              .send({
+                username, 
+                password
+              });
+          })
+          .then((res) => {
+            authToken = res.body.authToken;
+            return chai
+              .request(app)  
+              .delete('/api/parent')
+              .set('Authorization', `Bearer ${authToken}`);
+          })
+          .then(() => {
+            return Parent.findOne({username: username});
+          })
+          .then((result) => {
+            expect(result).to.equal(null);
+            return;
+          });
+          
+      });
+    });
+  });
 
 });
