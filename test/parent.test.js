@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const {TEST_DATABASE_URL} = require('../config');
 
 const Parent = require('../models/parent');
+const Child = require('../models/child');
 let jwtDecode = require('jwt-decode');
 
 const expect = chai.expect;
@@ -55,7 +56,7 @@ describe('Parent User', function() {
             res = _res;
             expect(res).to.have.status(201);
             expect(res.body).to.be.an('object');
-            expect(res.body).to.include.keys('id', 'username', 'name', 'email', 'child', 'isParent', 'rewards');
+            expect(res.body).to.include.keys('id', 'username', 'name', 'email', 'child', 'isParent');
             expect(res.body.id).to.exist;
             expect(res.body.username).to.equal(username);
             return Parent.findOne({ username });
@@ -155,7 +156,7 @@ describe('Parent User', function() {
             let child = decoded.user.child[0];
             expect(child.username).to.equal(childUser);
             expect(child.name).to.equal(childName);
-            expect(child).to.have.keys('totalPoints', 'currentPoints', 'tasks', 'rewards', 'username', 'name', 'parentId', 'id');
+            expect(child).to.have.keys('totalPoints', 'currentPoints', 'tasks', 'username', 'name', 'parentId', 'id', 'rewards');
             return ;
           });
           
@@ -296,5 +297,67 @@ describe('Parent User', function() {
       });
     });
   });
+
+  // describe.only('Delete /api/parent/:childId', function(){
+  //   it('Should delete a user', function() {
+  //     let authToken;
+  //     return chai
+  //       .request(app)
+  //       .post('/api/parent')
+  //       .send({ username, password , email, name})
+  //       .then(() => {
+  //         return chai
+  //           .request(app)
+  //           .post('/api/login')
+  //           .send({
+  //             username, 
+  //             password
+  //           });
+  //       })
+  //       .then(result => {
+  //         authToken = result.body.authToken;
+  //         return chai
+  //           .request(app)  
+  //           .post('/api/parent/child')
+  //           .set('Authorization', `Bearer ${authToken}`)
+  //           .send({username: childUser,password: childPassword,name: childName});
+  //       })
+  //       .then(result => {
+  //         let authToken = result.body.authToken;
+  //         let decodedToken = jwtDecode(result.body.authToken);
+  //         let id = decodedToken.user.child[0].id;
+  //         console.log('result',decodedToken.user.child[0].id);
+  //         return Child.findById(id);
+  //         // return chai
+  //         //   .request(app)
+  //         //   .delete('/api/parent/' + decodedToken.user.child[0].id)
+  //         //   .set('Authorization', `Bearer ${result.body.authToken}`);
+  //       })
+  //       .then(result => {
+  //         console.log('1',result);
+  //         return chai
+  //           .request(app)
+  //           .delete('/api/parent/' + result.id)
+  //           .set('Authorization', `Bearer ${authToken}`);
+  //       })
+  //       .then(result => {
+  //         console.log(result)
+  //       });
+  //     // .then((res) => {
+  //     //   authToken = res.body.authToken;
+  //     //   return chai
+  //     //     .request(app)  
+  //     //     .delete('/api/parent')
+  //     //     .set('Authorization', `Bearer ${authToken}`);
+  //     // })
+  //     // .then(() => {
+  //     //   return Parent.findOne({username: username});
+  //     // })
+  //     // .then((result) => {
+  //     //   expect(result).to.equal(null);
+  //     //   return;
+  //     // });
+  //   });
+  // });
 
 });
