@@ -169,7 +169,7 @@ router.delete('/:id', (req, res, next) => {
     })
     .then(child => {
       //filter the childs rewards and update
-      let newRewards = child.rewards.filter(reward => reward.id === id);
+      let newRewards = child.rewards.filter(reward => reward.id !== id);
       return Child.findByIdAndUpdate(child.id, {rewards: newRewards});
     })
     .then(() => {
