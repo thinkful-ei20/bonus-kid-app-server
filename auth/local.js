@@ -6,7 +6,7 @@ const User = require('../models/parent');
 
 const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
-  console.log(username);
+  // console.log(username);
   User.find({ username })
     .populate([{
       path: 'child', 
@@ -27,7 +27,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
       model: 'Rewards'
     }])
     .then(results => {
-      console.log(results);
+      // console.log(results);
       user = results[0];
       if (!user) {
         return Promise.reject({
