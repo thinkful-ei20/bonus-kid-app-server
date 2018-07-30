@@ -135,22 +135,22 @@ describe('Parent User', function() {
           .post('/api/parent')
           .send({ username, password , email, name})
           .then(() => {
-              return chai
-                .request(app)
-                .post('/api/login')
-                .send({
-                  username, 
-                  password
-                });
+            return chai
+              .request(app)
+              .post('/api/login')
+              .send({
+                username, 
+                password
+              });
           })
           .then((res) => {
             authToken = res.body.authToken;
             // console.log(authToken);
             return chai
-            .request(app)  
-            .post('/api/parent/child')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({username: childUser,password: childPassword,name: childName});
+              .request(app)  
+              .post('/api/parent/child')
+              .set('Authorization', `Bearer ${authToken}`)
+              .send({username: childUser,password: childPassword,name: childName});
           })
           .then(res => {
             let decoded = jwtDecode(res.body.authToken);
@@ -172,22 +172,22 @@ describe('Parent User', function() {
           .post('/api/parent')
           .send({ username, password , email, name})
           .then(() => {
-              return chai
-                .request(app)
-                .post('/api/login')
-                .send({
-                  username, 
-                  password
-                });
+            return chai
+              .request(app)
+              .post('/api/login')
+              .send({
+                username, 
+                password
+              });
           })
           .then((res) => {
             authToken = res.body.authToken;
             // console.log(authToken);
             return chai
-            .request(app)  
-            .post('/api/parent/child')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({password: childPassword,name: childName});
+              .request(app)  
+              .post('/api/parent/child')
+              .set('Authorization', `Bearer ${authToken}`)
+              .send({password: childPassword,name: childName});
           })
           .catch(err => {
             expect(err.response.body.error).to.have.status(422);
@@ -205,22 +205,22 @@ describe('Parent User', function() {
           .post('/api/parent')
           .send({ username, password , email, name})
           .then(() => {
-              return chai
-                .request(app)
-                .post('/api/login')
-                .send({
-                  username, 
-                  password
-                });
+            return chai
+              .request(app)
+              .post('/api/login')
+              .send({
+                username, 
+                password
+              });
           })
           .then((res) => {
             authToken = res.body.authToken;
             // console.log(authToken);
             return chai
-            .request(app)  
-            .post('/api/parent/child')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({username: childUser, name: childName});
+              .request(app)  
+              .post('/api/parent/child')
+              .set('Authorization', `Bearer ${authToken}`)
+              .send({username: childUser, name: childName});
           })
           .catch(err => {
             expect(err.response.body.error).to.have.status(422);
@@ -238,22 +238,22 @@ describe('Parent User', function() {
           .post('/api/parent')
           .send({ username, password , email, name})
           .then(() => {
-              return chai
-                .request(app)
-                .post('/api/login')
-                .send({
-                  username, 
-                  password
-                });
+            return chai
+              .request(app)
+              .post('/api/login')
+              .send({
+                username, 
+                password
+              });
           })
           .then((res) => {
             authToken = res.body.authToken;
             // console.log(authToken);
             return chai
-            .request(app)  
-            .post('/api/parent/child')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({username: childUser, password: childPassword});
+              .request(app)  
+              .post('/api/parent/child')
+              .set('Authorization', `Bearer ${authToken}`)
+              .send({username: childUser, password: childPassword});
           })
           .catch(err => {
             expect(err.response.body.error).to.have.status(400);
@@ -265,5 +265,7 @@ describe('Parent User', function() {
       });
     });
   });
+
+  
 
 });
