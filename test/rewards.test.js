@@ -18,7 +18,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe.only('Rewards', function() {
+describe('Rewards', function() {
   this.timeout(5000);
   const username = 'testuser';
   const password = 'password123';
@@ -353,5 +353,61 @@ describe.only('Rewards', function() {
     });
   });
 
-  
+  describe('PUT /api/rewards/:id', function (){
+    it('should update reward as purchased when child buys a reward', function() {
+      let child;
+      let authToken;
+      let reward = {
+        name: 'test',
+        pointValue: 45
+      };
+      
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/rewards/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(reward);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let rewardId = decoded.user.child[0].rewards[0].id;
+          return chai.request(app)
+            .put(`/api/rewards/${rewardId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({name: 'hello', pointValue: 580});
+        })
+        .then((res) => {
+          return chai
+            .request(app)
+            .post('/api/childLogin')
+            .send({username: childUser, password: childPassword});
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let rewardId = decoded.user.rewards[0].id;
+          return chai.request(app)
+            .put(`/api/rewards/child/${rewardId}`)
+            .send({purchased: true})
+            .set('Authorization', `Bearer ${res.body.authToken}`);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+          expect(res.body).to.be.a('object');
+          expect(decoded.user.rewards[0].purchased).to.equal(true);
+        });
+    });
+
+  });
 });
