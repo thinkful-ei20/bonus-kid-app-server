@@ -313,114 +313,244 @@ describe('Tasks', function() {
           expect(res.body).to.include.keys('authToken');
         });
     });
+
+    it('Should set complete to true', function() {
+      let child;
+      let authToken;
+      let task = {
+        name: 'test',
+        pointValue: 45,
+        day: 2,
+        hour: 1
+      };
+      
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/tasks/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(task);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let taskId = decoded.user.child[0].tasks[0].id;
+          return chai.request(app)
+            .put(`/api/tasks/${taskId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({complete: true});
+        })
+        .then((res) => {
+          let decoded = jwtDecode(res.body.authToken);
+          let task = decoded.user.child[0].tasks[0];
+          expect(decoded.user.child[0].currentPoints).to.equal(45);
+          expect(decoded.user.child[0].totalPoints).to.equal(45);
+          expect(task.complete).to.equal(true);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    });
+
+    it('Should set complete to true', function() {
+      let child;
+      let authToken;
+      let task = {
+        name: 'test',
+        pointValue: 45,
+        day: 2,
+        hour: 1,
+        complete: true
+      };
+      
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/tasks/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(task);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let taskId = decoded.user.child[0].tasks[0].id;
+          return chai.request(app)
+            .put(`/api/tasks/${taskId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({complete: false});
+        })
+        .then((res) => {
+          let decoded = jwtDecode(res.body.authToken);
+          let task = decoded.user.child[0].tasks[0];
+          expect(decoded.user.child[0].currentPoints).to.equal(-45);
+          expect(decoded.user.child[0].totalPoints).to.equal(-45);
+          expect(task.complete).to.equal(false);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    });
   });
 
-  // describe('Delete /api/rewards/:id', function (){
-  //   it('delete a reward by id', function() {
-  //     let child;
-  //     let authToken;
-  //     let reward = {
-  //       name: 'test',
-  //       pointValue: 45
-  //     };
+  describe('Delete /api/tasks/:id', function (){
+    it('delete a task by id', function() {
+      let child;
+      let authToken;
+      let task = {
+        name: 'test',
+        pointValue: 45
+      };
       
-  //     return Child
-  //       .findOne()
-  //       .then((res) => child = res)
-  //       .then(() => (
-  //         chai
-  //           .request(app)
-  //           .post('/api/login')
-  //           .send({username, password})
-  //       ))
-  //       .then(res => {
-  //         authToken = res.body.authToken;
-  //         return chai.request(app)
-  //           .post(`/api/rewards/${child.id}`)
-  //           .set('Authorization', `Bearer ${authToken}`)
-  //           .send(reward);
-  //       })
-  //       .then(res => {
-  //         let decoded = jwtDecode(res.body.authToken);
-  //         let rewardId = decoded.user.child[0].rewards[0].id;
-  //         return chai.request(app)
-  //           .put(`/api/rewards/${rewardId}`)
-  //           .set('Authorization', `Bearer ${authToken}`)
-  //           .send({name: 'hello', pointValue: 580});
-  //       })
-  //       .then((res) => {
-  //         let decoded = jwtDecode(res.body.authToken);
-  //         let reward = decoded.user.child[0].rewards[0];
-  //         // console.log(reward);
-  //         return chai.request(app)
-  //           .delete(`/api/rewards/${reward.id}`)
-  //           .set('Authorization', `Bearer ${res.body.authToken}`);
-  //       })
-  //       .then(res => {
-  //         let decoded = jwtDecode(res.body.authToken);
-          
-  //         expect(decoded.user.child.rewards).to.equal(undefined);
-  //         expect(res).to.have.status(200);
-  //         expect(res.body).to.include.keys('authToken');
-  //       });
-  //   });
-  // });
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/tasks/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(task);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let taskId = decoded.user.child[0].tasks[0].id;
+          return chai.request(app)
+            .delete(`/api/tasks/${taskId}`)
+            .set('Authorization', `Bearer ${authToken}`);
+        })
+        .then((res) => {
+          let decoded = jwtDecode(res.body.authToken);
+          let child = decoded.user.child[0];
 
-  // describe('PUT /api/rewards/:id', function (){
-  //   it('should update reward as purchased when child buys a reward', function() {
-  //     let child;
-  //     let authToken;
-  //     let reward = {
-  //       name: 'test',
-  //       pointValue: 45
-  //     };
+          expect(child.tasks.length).to.equal(0);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    });
+  });
+
+  describe('PUT /api/tasks/child/:id', function (){
+    it('Should be able to update a task childComplete property to true', function() {
+      let child;
+      let authToken;
+      let task = {
+        name: 'test',
+        pointValue: 45
+      };
       
-  //     return Child
-  //       .findOne()
-  //       .then((res) => child = res)
-  //       .then(() => (
-  //         chai
-  //           .request(app)
-  //           .post('/api/login')
-  //           .send({username, password})
-  //       ))
-  //       .then(res => {
-  //         authToken = res.body.authToken;
-  //         return chai.request(app)
-  //           .post(`/api/rewards/${child.id}`)
-  //           .set('Authorization', `Bearer ${authToken}`)
-  //           .send(reward);
-  //       })
-  //       .then(res => {
-  //         let decoded = jwtDecode(res.body.authToken);
-  //         let rewardId = decoded.user.child[0].rewards[0].id;
-  //         return chai.request(app)
-  //           .put(`/api/rewards/${rewardId}`)
-  //           .set('Authorization', `Bearer ${authToken}`)
-  //           .send({name: 'hello', pointValue: 580});
-  //       })
-  //       .then((res) => {
-  //         return chai
-  //           .request(app)
-  //           .post('/api/childLogin')
-  //           .send({username: childUser, password: childPassword});
-  //       })
-  //       .then(res => {
-  //         let decoded = jwtDecode(res.body.authToken);
-  //         let rewardId = decoded.user.rewards[0].id;
-  //         return chai.request(app)
-  //           .put(`/api/rewards/child/${rewardId}`)
-  //           .send({purchased: true})
-  //           .set('Authorization', `Bearer ${res.body.authToken}`);
-  //       })
-  //       .then(res => {
-  //         let decoded = jwtDecode(res.body.authToken);
-  //         expect(res).to.have.status(200);
-  //         expect(res.body).to.include.keys('authToken');
-  //         expect(res.body).to.be.a('object');
-  //         expect(decoded.user.rewards[0].purchased).to.equal(true);
-  //       });
-  //   });
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/tasks/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(task);
+        })
+        .then(() => {
+          return chai.request(app)
+            .post('/api/childLogin')
+            .send({username: childUser, password: childPassword});
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let taskId = decoded.user.tasks[0].id;
+          return chai.request(app)
+            .put(`/api/tasks/child/${taskId}`)
+            .set('Authorization', `Bearer ${res.body.authToken}`)
+            .send({childComplete: true});
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let task = decoded.user.tasks[0];
+          expect(task.name).to.equal(task.name);
+          expect(task.pointValue).to.equal(task.pointValue);
+          expect(task.childComplete).to.equal(true);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    });
+    // it('should update reward as purchased when child buys a reward', function() {
+    //   let child;
+    //   let authToken;
+    //   let reward = {
+    //     name: 'test',
+    //     pointValue: 45
+    //   };
+      
+    //   return Child
+    //     .findOne()
+    //     .then((res) => child = res)
+    //     .then(() => (
+    //       chai
+    //         .request(app)
+    //         .post('/api/login')
+    //         .send({username, password})
+    //     ))
+    //     .then(res => {
+    //       authToken = res.body.authToken;
+    //       return chai.request(app)
+    //         .post(`/api/rewards/${child.id}`)
+    //         .set('Authorization', `Bearer ${authToken}`)
+    //         .send(reward);
+    //     })
+    //     .then(res => {
+    //       let decoded = jwtDecode(res.body.authToken);
+    //       let rewardId = decoded.user.child[0].rewards[0].id;
+    //       return chai.request(app)
+    //         .put(`/api/rewards/${rewardId}`)
+    //         .set('Authorization', `Bearer ${authToken}`)
+    //         .send({name: 'hello', pointValue: 580});
+    //     })
+    //     .then((res) => {
+    //       return chai
+    //         .request(app)
+    //         .post('/api/childLogin')
+    //         .send({username: childUser, password: childPassword});
+    //     })
+    //     .then(res => {
+    //       let decoded = jwtDecode(res.body.authToken);
+    //       let rewardId = decoded.user.rewards[0].id;
+    //       return chai.request(app)
+    //         .put(`/api/rewards/child/${rewardId}`)
+    //         .send({purchased: true})
+    //         .set('Authorization', `Bearer ${res.body.authToken}`);
+    //     })
+    //     .then(res => {
+    //       let decoded = jwtDecode(res.body.authToken);
+    //       expect(res).to.have.status(200);
+    //       expect(res.body).to.include.keys('authToken');
+    //       expect(res.body).to.be.a('object');
+    //       expect(decoded.user.rewards[0].purchased).to.equal(true);
+    //     });
+    // });
 
-  // });
+  });
 });
