@@ -19,6 +19,7 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 describe.only('Rewards', function() {
+  this.timeout(5000);
   const username = 'testuser';
   const password = 'password123';
   const email = 'test@gmail.com';
@@ -300,4 +301,57 @@ describe.only('Rewards', function() {
         });
     });
   });
+
+  describe('Delete /api/rewards/:id', function (){
+    it('delete a reward by id', function() {
+      let child;
+      let authToken;
+      let reward = {
+        name: 'test',
+        pointValue: 45
+      };
+      
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/rewards/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(reward);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let rewardId = decoded.user.child[0].rewards[0].id;
+          return chai.request(app)
+            .put(`/api/rewards/${rewardId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({name: 'hello', pointValue: 580});
+        })
+        .then((res) => {
+          let decoded = jwtDecode(res.body.authToken);
+          let reward = decoded.user.child[0].rewards[0];
+          // console.log(reward);
+          return chai.request(app)
+            .delete(`/api/rewards/${reward.id}`)
+            .set('Authorization', `Bearer ${res.body.authToken}`);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          
+          expect(decoded.user.child.rewards).to.equal(undefined);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    });
+  });
+
+  
 });
