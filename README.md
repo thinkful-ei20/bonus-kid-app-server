@@ -40,57 +40,164 @@ To minimize fetch calls to the server, we store the data inside the auth token. 
 Our parent calls to the endpoint will return updated authtokens that hold any updated data. The decoded JWT token will look like below: 
 
 ```
-
-    {
+{
+  "user": {
+    "child": [
       {
-      "user": {
-        "child": [
+        "totalPoints": 75,
+        "currentPoints": 75,
+        "tasks": [
           {
-            "totalPoints": 100,
-            "currentPoints": 50,
-            "tasks": [
-              {
-                "complete": false,
-                "childComplete": false,
-                "expiryDate": "",
-                "currentTime": "",
-                "name": "A on a test",
-                "pointValue": 10,
-                "childId": "5b57405c028ed933fc3d6bb7",
-                "parentId": "5b57405c028ed933fc3d6bb3",
-                "createdAt": "2018-07-24T15:06:04.779Z",
-                "updatedAt": "2018-07-24T15:06:04.779Z",
-                "id": "5b57405c028ed933fc3d6bbf"
-              }
-            ],
-            "username": "some other kid",
-            "name": "some other kid",
-            "parentId": "5b57405c028ed933fc3d6bb3",
-            "id": "5b57405c028ed933fc3d6bb7"
+            "complete": true,
+            "childComplete": true,
+            "expiryDate": "1532962561393",
+            "currentTime": "1532962561393",
+            "updatedTime": "1532964124474",
+            "name": "343",
+            "pointValue": 43,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T14:56:01.395Z",
+            "updatedAt": "2018-07-30T15:24:21.404Z",
+            "id": "5b5f2701dbc9ec2044faf96f"
+          },
+          {
+            "complete": true,
+            "childComplete": true,
+            "expiryDate": "1532963906161",
+            "currentTime": "1532963906160",
+            "updatedTime": "1532964357190",
+            "name": "tete",
+            "pointValue": 32,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T15:18:26.169Z",
+            "updatedAt": "2018-07-30T15:26:21.278Z",
+            "id": "5b5f2c4216a4180a249059a5"
+          },
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532965351709",
+            "currentTime": "1532965351709",
+            "updatedTime": null,
+            "name": "fs",
+            "pointValue": 42,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T15:42:31.710Z",
+            "updatedAt": "2018-07-30T15:42:31.710Z",
+            "id": "5b5f31e7345189210852f749"
           }
         ],
         "rewards": [
           {
             "purchased": false,
-            "expiryDate": "",
-            "currentTime": "",
-            "name": "trip to amusement park",
-            "pointValue": 1000,
-            "parentId": "5b57405c028ed933fc3d6bb3",
-            "id": "5b57405c028ed933fc3d6bbb"
+            "expiryDate": "1532963656305",
+            "currentTime": "1532963656305",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "434343",
+            "pointValue": 32,
+            "id": "5b5f2b4840fa571db4f4e0f1"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532964290574",
+            "currentTime": "1532964290574",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "dsad",
+            "pointValue": 32,
+            "id": "5b5f2dc2deb49317942e4d34"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532965037275",
+            "currentTime": "1532965037275",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "r2",
+            "pointValue": 32,
+            "id": "5b5f30ad345189210852f745"
           }
         ],
-        "username": "Tammy",
-        "isParent": true,
-        "name": "Tammy",
-        "email": "Tammy@gmail.com",
-        "id": "5b57405c028ed933fc3d6bb3"
+        "username": "testing",
+        "name": "testing",
+        "parentId": "5b5f2584dbc9ec2044faf96d",
+        "id": "5b5f26efdbc9ec2044faf96e"
       },
-      "iat": 1532449375,
-      "exp": 1533054175,
-      "sub": "Tammy"
+      {
+        "totalPoints": 0,
+        "currentPoints": 0,
+        "tasks": [
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532964994432",
+            "currentTime": "1532964994431",
+            "updatedTime": null,
+            "name": "fs",
+            "pointValue": 31,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "createdAt": "2018-07-30T15:36:34.443Z",
+            "updatedAt": "2018-07-30T15:36:34.443Z",
+            "id": "5b5f3082345189210852f743"
+          },
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532965357098",
+            "currentTime": "1532965357098",
+            "updatedTime": null,
+            "name": "tete",
+            "pointValue": 42,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "createdAt": "2018-07-30T15:42:37.099Z",
+            "updatedAt": "2018-07-30T15:42:37.099Z",
+            "id": "5b5f31ed345189210852f74a"
+          }
+        ],
+        "rewards": [
+          {
+            "purchased": false,
+            "expiryDate": "1532965043274",
+            "currentTime": "1532965043274",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "name": "rere",
+            "pointValue": 43,
+            "id": "5b5f30b3345189210852f746"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532965071492",
+            "currentTime": "1532965071492",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "name": "this is a test",
+            "pointValue": 43,
+            "id": "5b5f30cf345189210852f748"
+          }
+        ],
+        "username": "test2",
+        "name": "test",
+        "parentId": "5b5f2584dbc9ec2044faf96d",
+        "id": "5b5f2de6deb49317942e4d35"
       }
-    }
+    ],
+    "username": "noRewards",
+    "name": "test",
+    "email": "noRewards@gmail.com",
+    "isParent": true,
+    "id": "5b5f2584dbc9ec2044faf96d"
+  },
+  "iat": 1533092329,
+  "exp": 1533697129,
+  "sub": "noRewards"
+}
 ```
 
 
@@ -114,7 +221,166 @@ Our parent calls to the endpoint will return updated authtokens that hold any up
 ```
     {
       "authToken" : "authToken"
-    }
+    } 
+    translates to: 
+    {
+  "user": {
+    "child": [
+      {
+        "totalPoints": 75,
+        "currentPoints": 75,
+        "tasks": [
+          {
+            "complete": true,
+            "childComplete": true,
+            "expiryDate": "1532962561393",
+            "currentTime": "1532962561393",
+            "updatedTime": "1532964124474",
+            "name": "343",
+            "pointValue": 43,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T14:56:01.395Z",
+            "updatedAt": "2018-07-30T15:24:21.404Z",
+            "id": "5b5f2701dbc9ec2044faf96f"
+          },
+          {
+            "complete": true,
+            "childComplete": true,
+            "expiryDate": "1532963906161",
+            "currentTime": "1532963906160",
+            "updatedTime": "1532964357190",
+            "name": "tete",
+            "pointValue": 32,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T15:18:26.169Z",
+            "updatedAt": "2018-07-30T15:26:21.278Z",
+            "id": "5b5f2c4216a4180a249059a5"
+          },
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532965351709",
+            "currentTime": "1532965351709",
+            "updatedTime": null,
+            "name": "fs",
+            "pointValue": 42,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "createdAt": "2018-07-30T15:42:31.710Z",
+            "updatedAt": "2018-07-30T15:42:31.710Z",
+            "id": "5b5f31e7345189210852f749"
+          }
+        ],
+        "rewards": [
+          {
+            "purchased": false,
+            "expiryDate": "1532963656305",
+            "currentTime": "1532963656305",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "434343",
+            "pointValue": 32,
+            "id": "5b5f2b4840fa571db4f4e0f1"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532964290574",
+            "currentTime": "1532964290574",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "dsad",
+            "pointValue": 32,
+            "id": "5b5f2dc2deb49317942e4d34"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532965037275",
+            "currentTime": "1532965037275",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f26efdbc9ec2044faf96e",
+            "name": "r2",
+            "pointValue": 32,
+            "id": "5b5f30ad345189210852f745"
+          }
+        ],
+        "username": "testing",
+        "name": "testing",
+        "parentId": "5b5f2584dbc9ec2044faf96d",
+        "id": "5b5f26efdbc9ec2044faf96e"
+      },
+      {
+        "totalPoints": 0,
+        "currentPoints": 0,
+        "tasks": [
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532964994432",
+            "currentTime": "1532964994431",
+            "updatedTime": null,
+            "name": "fs",
+            "pointValue": 31,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "createdAt": "2018-07-30T15:36:34.443Z",
+            "updatedAt": "2018-07-30T15:36:34.443Z",
+            "id": "5b5f3082345189210852f743"
+          },
+          {
+            "complete": false,
+            "childComplete": false,
+            "expiryDate": "1532965357098",
+            "currentTime": "1532965357098",
+            "updatedTime": null,
+            "name": "tete",
+            "pointValue": 42,
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "createdAt": "2018-07-30T15:42:37.099Z",
+            "updatedAt": "2018-07-30T15:42:37.099Z",
+            "id": "5b5f31ed345189210852f74a"
+          }
+        ],
+        "rewards": [
+          {
+            "purchased": false,
+            "expiryDate": "1532965043274",
+            "currentTime": "1532965043274",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "name": "rere",
+            "pointValue": 43,
+            "id": "5b5f30b3345189210852f746"
+          },
+          {
+            "purchased": false,
+            "expiryDate": "1532965071492",
+            "currentTime": "1532965071492",
+            "parentId": "5b5f2584dbc9ec2044faf96d",
+            "childId": "5b5f2de6deb49317942e4d35",
+            "name": "this is a test",
+            "pointValue": 43,
+            "id": "5b5f30cf345189210852f748"
+          }
+        ],
+        "username": "test2",
+        "name": "test",
+        "parentId": "5b5f2584dbc9ec2044faf96d",
+        "id": "5b5f2de6deb49317942e4d35"
+      }
+    ],
+    "username": "noRewards",
+    "name": "test",
+    "email": "noRewards@gmail.com",
+    "isParent": true,
+    "id": "5b5f2584dbc9ec2044faf96d"
+  },
+  "iat": 1533092329,
+  "exp": 1533697129,
+  "sub": "noRewards"
+}
 ```
 
 The decoded authToken will provide all the necessary data to render the pages (see above).
