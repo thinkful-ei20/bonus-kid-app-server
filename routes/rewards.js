@@ -23,8 +23,8 @@ router.post('/:childId', (req, res, next) => {
   let { name, pointValue, purchased, day, hour } = req.body;
   let {childId} = req.params;
   const { id } = req.user;
-
-  //initializing variable for use in promises
+  
+  // //initializing variable for use in promises
   let updatedRewards;
   let rewardTest;
   let updateChildRewards;
@@ -32,7 +32,7 @@ router.post('/:childId', (req, res, next) => {
   if (!day) day = 0;
   if (!hour) hour = 0;
 
-  //create new reward
+  // //create new reward
   Rewards.create({
     parentId: id,
     childId,
@@ -45,30 +45,20 @@ router.post('/:childId', (req, res, next) => {
     .then(reward => {
       //assign rewardTest to the returned value
       rewardTest = reward;
-      return Parent.findById(id);
+      return Child.findById(childId);
     })
     .then(child => {
       //assign updateChildRewards with the new updated reward array
       updateChildRewards = { rewards: [...child.rewards, rewardTest.id] };
-      return;
+      return
     })
     .then(() => {
       //update the child with the reward array
       return Child.findByIdAndUpdate(childId, updateChildRewards);
     })
     .then(() => {
-      //assign rewardIds with the rewards id of the parent
-      let rewardsIds = req.user.rewards.map((reward) => reward.id);
-      updatedRewards = { rewards: [...rewardsIds, rewardTest.id] };
-      return;
-    })
-    .then(() => {
-      //update the parent rewards with the new rewards array
-      return Parent.findByIdAndUpdate({ _id: id }, updatedRewards, { new: true });
-    })
-    .then((result) => {
       //populate the parent with new data
-      return populateParent(result.id);
+      return populateParent(id);
     })
     .then((result) => {
       //create authToken with the result and send back
@@ -169,7 +159,7 @@ router.delete('/:id', (req, res, next) => {
     })
     .then(child => {
       //filter the childs rewards and update
-      let newRewards = child.rewards.filter(reward => reward.id === id);
+      let newRewards = child.rewards.filter(reward => reward.id !== id);
       return Child.findByIdAndUpdate(child.id, {rewards: newRewards});
     })
     .then(() => {

@@ -25,7 +25,7 @@ const router = express.Router();
 router.post('/', (req, res, next) => {
 
   //checks for any missing fields
-  missingField(['username', 'password'], req);
+  missingField(['username', 'password', 'email'], req);
 
   //checks to see if username and pass are not strings
   nonStringField(req);

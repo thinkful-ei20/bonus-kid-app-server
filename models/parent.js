@@ -13,11 +13,6 @@ const parentSchema = mongoose.Schema({
 
     { type: mongoose.Schema.ObjectId, ref: 'Child' }
 
-  ],
-  rewards: [
-
-    { type: mongoose.Schema.ObjectId, ref: 'Rewards' }
-
   ]
 });
 

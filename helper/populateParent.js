@@ -4,7 +4,7 @@ const Parent = require('../models/parent');
 
 module.exports = function populateParent(id){
   return Parent.findById(id)
-            .populate([{
+            .populate({
               path: 'child',
               model: 'Child',
               populate: [
@@ -17,11 +17,7 @@ module.exports = function populateParent(id){
                   model: 'Rewards'
                 }        
               ],
-            },
-            {
-              path: 'rewards',
-              model: 'Rewards'
-            }])
+            })
             .then((result) => {
               return result;
             })
