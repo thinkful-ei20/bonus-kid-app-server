@@ -3,6 +3,10 @@ Did she get all A's in school?
 Did he do all his chores?
 Those kids deserve a bonus!
 
+## Motivation
+When we started creating the server we were designing it the traditional way of creating models and linking them with
+ids. We had to iterate through the ids and make multiple calls. To make our lives easier we decided on making the server just always send an auth token. Every endpoint changes the database and responds with an updated auth token. The downside of this route is that when the data gets bigger the auth token will also get bigger it will slow down because of the size. It's something to keep in mind if the app starts to get slow.
+
 ### Live client!
 https://dashboard.heroku.com/apps/bonus-kid-client
 
