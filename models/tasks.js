@@ -13,7 +13,8 @@ const tasksSchema = mongoose.Schema({
   parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
   expiryDate: {type: String, require:true, default: ''},
   currentTime: {type: String, require: true, default: ''}, 
-  updatedTime: {type: String, require: true, default: null}
+  updatedTime: {type: String, require: true, default: null},
+  denied: {type: Boolean, require: true, default: false},
 }, {timestamps: true});
 
 tasksSchema.set('toObject', {

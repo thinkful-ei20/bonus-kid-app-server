@@ -73,7 +73,7 @@ router.post('/:childId', (req, res, next) => {
 router.put('/:id', (req, res, next) => {
   //destructure and initialize vars
   const { id } = req.params;
-  let { name, pointValue, hour, day, complete } = req.body;
+  let { name, pointValue, hour, day, complete, denied } = req.body;
   hour = parseInt(hour);
   day = parseInt(day);
   const userId = req.user.id;
@@ -90,6 +90,7 @@ router.put('/:id', (req, res, next) => {
   if(complete === true){
     //set the updatedTask obj to true
     updatedTask.complete = true;
+    updatedTask.denied = false;
     let returnResult;
 
     Tasks.findByIdAndUpdate({ _id: id, parentId: userId }, updatedTask, { new: true })
@@ -168,6 +169,28 @@ router.put('/:id', (req, res, next) => {
           });
       });
   } 
+    // =========== Denying childComplete =========== 
+  else if(denied === true){
+    Tasks.findById(id)
+      .then(() => {
+        updatedTask.denied = true
+        updatedTask.childComplete = false;
+
+      })
+      .then(() => {
+        return Tasks.findByIdAndUpdate({_id: id, parentId:userId}, updatedTask, {new: true})
+          .then(result => {
+          return populateParent(result.parentId);
+        })
+        .then(result => {
+          const authToken = createAuthToken(result);
+          res.json({authToken});
+        })
+        .catch(err => {
+          next(err);
+        });
+    });
+  }
   // ============ Normal Update: name/pointValue/expireDate =================
   else {
     //if it doesnt reset the time or check to see if its complete it runs
@@ -200,6 +223,7 @@ router.put('/child/:id', (req,res,next) => {
   //if childComplete set the childComplete prop of the obj to true
   if(childComplete){
     updateTask.childComplete = true;
+    updateTask.denied = false;
   } 
 
   //set updatedTime to epoch time of the current time
