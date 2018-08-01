@@ -20,6 +20,16 @@ Standard/Thinkful-style
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 
+### Back-End Tech:
+- jwt-decode
+- Express
+- bcrypt
+- momentjs
+- nodemon
+- passport
+- passport-jwt
+- passport-local
+
 Bonus Kid Sever Endpoints
 ========================
 
