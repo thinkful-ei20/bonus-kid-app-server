@@ -21,5 +21,5 @@ module.exports = function populateParent(id){
             .then((result) => {
               return result;
             })
-            .catch(err => console.log('error', err))
+            .catch(err => console.log('error', err));
 };

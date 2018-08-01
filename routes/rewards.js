@@ -50,7 +50,7 @@ router.post('/:childId', (req, res, next) => {
     .then(child => {
       //assign updateChildRewards with the new updated reward array
       updateChildRewards = { rewards: [...child.rewards, rewardTest.id] };
-      return
+      return;
     })
     .then(() => {
       //update the child with the reward array
@@ -170,8 +170,8 @@ router.delete('/:id', (req, res, next) => {
       return populateParent(req.user.id);
     })
     .then((result) => {
-        const authToken = createAuthToken(result);
-        res.send({ authToken });
+      const authToken = createAuthToken(result);
+      res.send({ authToken });
     });
 });
 
@@ -181,7 +181,6 @@ router.delete('/:id', (req, res, next) => {
 //Development
 router.get('/child', (req, res, next) => {
   const { parentId } = req.user;
-  console.log('xx', parentId);
 
 
   Rewards.find({ parentId })
@@ -217,7 +216,7 @@ router.put('/child/:id', (req, res, next) =>{
         if(purchased === true){
           updateReward.purchased = purchased;
         }
-        return Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true})
+        return Rewards.findByIdAndUpdate({_id: id}, updateReward, {new:true});
       }
     })
     .then(result => {
