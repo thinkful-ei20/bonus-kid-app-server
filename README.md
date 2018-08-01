@@ -1,4 +1,4 @@
-# Bonus Kid Client
+# Bonus Kid Server
 Did she get all A's in school?
 Did he do all his chores?
 Those kids deserve a bonus!
