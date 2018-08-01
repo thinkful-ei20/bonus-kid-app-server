@@ -6,7 +6,6 @@ const Child = require('../models/child');
 
 const localChildStrategy = new LocalStrategy((username, password, done) => {
   let user;
-  console.log(username);
   Child.find({ username })
     .populate([{ 
       path: 'tasks',

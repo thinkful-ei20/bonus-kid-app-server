@@ -26,7 +26,7 @@ router.get('/:id', (req, res, next) => {
       res.json(user);
     })
     .catch(err => {
-      let error = new Error('invalid id')
+      let error = new Error('invalid id');
       error.status = 400;
       next(error);
     });
