@@ -171,25 +171,20 @@ router.put('/:id', (req, res, next) => {
   } 
     // =========== Denying childComplete =========== 
   else if(denied === true){
-    Tasks.findById(id)
-      .then(() => {
-        updatedTask.denied = true
-        updatedTask.childComplete = false;
+    updatedTask.denied = true
+    updatedTask.childComplete = false;
 
+    Tasks.findByIdAndUpdate({_id: id, parentId:userId}, updatedTask, {new: true})
+      .then(result => {
+      return populateParent(result.parentId);
       })
-      .then(() => {
-        return Tasks.findByIdAndUpdate({_id: id, parentId:userId}, updatedTask, {new: true})
-          .then(result => {
-          return populateParent(result.parentId);
-        })
-        .then(result => {
-          const authToken = createAuthToken(result);
-          res.json({authToken});
-        })
-        .catch(err => {
-          next(err);
-        });
-    });
+      .then(result => {
+        const authToken = createAuthToken(result);
+        res.json({authToken});
+      })
+      .catch(err => {
+        next(err);
+      });   
   }
   // ============ Normal Update: name/pointValue/expireDate =================
   else {
