@@ -30,7 +30,7 @@ mongoose.connect(DATABASE_URL)
     ]);
   })
   .then((results) => {    
-    seedParent.forEach((user, i) => {user.password = results[0][i]});
+    seedParent.forEach((user, i) => {user.password = results[0][i];});
     seedChild.forEach((kid, i) => kid.password = results[1][i]);
 
     return Promise.all([
