@@ -404,6 +404,50 @@ describe('Tasks', function() {
           expect(res.body).to.include.keys('authToken');
         });
     });
+
+    it('Should set denied to true', function() {
+      let child;
+      let authToken;
+      let task = {
+        name: 'test',
+        pointValue: 45,
+        day: 2,
+        hour: 1,
+        complete: true
+      };
+      
+      return Child
+        .findOne()
+        .then((res) => child = res)
+        .then(() => (
+          chai
+            .request(app)
+            .post('/api/login')
+            .send({username, password})
+        ))
+        .then(res => {
+          authToken = res.body.authToken;
+          return chai.request(app)
+            .post(`/api/tasks/${child.id}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send(task);
+        })
+        .then(res => {
+          let decoded = jwtDecode(res.body.authToken);
+          let taskId = decoded.user.child[0].tasks[0].id;
+          return chai.request(app)
+            .put(`/api/tasks/${taskId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({denied: true});
+        })
+        .then((res) => {
+          let decoded = jwtDecode(res.body.authToken);
+          let task = decoded.user.child[0].tasks[0];
+          expect(task.denied).to.equal(true);
+          expect(res).to.have.status(200);
+          expect(res.body).to.include.keys('authToken');
+        });
+    })
   });
 
   describe('Delete /api/tasks/:id', function (){
