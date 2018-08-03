@@ -8,7 +8,7 @@ When we started creating the server we were designing it the traditional way of 
 ids. We had to iterate through the ids and make multiple calls. To make our lives easier we decided on making the server just always send an auth token. Every endpoint changes the database and responds with an updated auth token. The downside of this route is that when the data gets bigger the auth token will also get bigger it will slow down because of the size. It's something to keep in mind if the app starts to get slow.
 
 ### Live client!
-https://dashboard.heroku.com/apps/bonus-kid-client
+http://bonuskid.tk
 
 Create an account and start earning! It's that simple! finish tasks, get rewarded!
 If your task is complete on time, you'll get full points towards awesome rewards!
