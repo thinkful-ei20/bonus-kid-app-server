@@ -13,6 +13,8 @@ http://bonuskid.tk
 Create an account and start earning! It's that simple! finish tasks, get rewarded!
 If your task is complete on time, you'll get full points towards awesome rewards!
 
+*View our [client side code here](https://github.com/thinkful-ei20/bonus-kid-app-client/tree/master/client).*
+
 ## Features
 - Give your children rewards for being productive!
 - Add tasks for them to complete.
