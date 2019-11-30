@@ -1,28 +1,29 @@
 'use strict'; 
-
+// rename to user  and change the schema for users
 const mongoose = require ('mongoose');
 const bcrypt = require('bcryptjs');
-
-const childSchema = mongoose.Schema({
+// used to be child schema
+const normalUserSchema = mongoose.Schema({
 
   name: {type: String, required: true},
   username: {type: String, required: true, unique: true},
   password: {type: String, required: true},
-  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
-  totalPoints: {type: Number, required: true, default: 0},
-  currentPoints: {type: Number, required:true, default: 0},
-  tasks: [
-    {type: mongoose.Schema.ObjectId, ref: 'Tasks', required: true}
-  ],
-  rewards: [
-    {type: mongoose.Schema.ObjectId, ref: 'Rewards'}
-  ]
+  age: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
+  email: { type: String, required: true, unique: true},
+  // totalPoints: {type: Number, required: true, default: 0},
+  // currentPoints: {type: Number, required:true, default: 0},
+  // tasks: [
+  //   {type: mongoose.Schema.ObjectId, ref: 'Tasks', required: true}
+  // ],
+  // rewards: [
+  //   {type: mongoose.Schema.ObjectId, ref: 'Rewards'}
+  // ]
   
     
   
 });
 
-childSchema.set('toObject', {
+normalUserSchema.set('toObject', {
   transform: function (doc,ret) {
     ret.id = ret._id;
     delete ret._id;
@@ -31,12 +32,12 @@ childSchema.set('toObject', {
   }
 });
 
-childSchema.methods.validatePassword = function (password) {
+normalUserSchema.methods.validatePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-childSchema.statics.hashPassword = function (password) {
+normalUserSchema.statics.hashPassword = function (password) {
   return bcrypt.hash(password, 10);
 };
 
-module.exports = mongoose.model('Child', childSchema);
+module.exports = mongoose.model('normalUser', normalUserSchema);

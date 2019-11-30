@@ -3,20 +3,28 @@
 const mongoose = require ('mongoose');
 
 //add categories at later 
+// this will be the posts being posted 
+// wll be public and available to everyone
 
-const rewardsSchema = mongoose.Schema({
-  parentId: {type: mongoose.Schema.ObjectId, ref: 'Parent', required: true},
-  childId: {type: mongoose.Schema.ObjectId, ref: 'Child'},
-  name: {type: String, required: true},
-  pointValue: {type: Number, required: true},
-  purchased: {type: Boolean, required: true, default: false},
-  expiryDate: {type: String, require:true, default: ''},
-  currentTime: {type: String, require: true, default: ''}
+const postsSchema = mongoose.Schema({
+  posterId: {type: mongoose.Schema.ObjectId, ref: 'normalUser', required: true},
+  // childId: {type: mongoose.Schema.ObjectId, ref: 'Child'},
+  title: {type: String, required: true},
+  description: {type: String, required: true, default: ''},
+  price: {type: Number, required: true, default: 0},
+  expiryDate: {type: String, required:true, default: ''},
+  currentTime: {type: String, required: true, default: ''},
+  views: {type: Number, required: true, default: 0},
+  videoUrl: {type: String, required: false},
+  thumbnail: {type: String, required: true},
+  geolocation: { type: String, required: true},
+  likes: { type: Number, required: true, default: 0}
 });
 
-rewardsSchema.index({name: 1, parentId: 1}, {unique: true});
+// read up on this 
+postsSchema.index({parentId: 1}, {unique: true});
 
-rewardsSchema.set('toObject', {
+postsSchema.set('toObject', {
   transform: function (doc,ret) {
     ret.id = ret._id;
     delete ret._id;
@@ -24,4 +32,4 @@ rewardsSchema.set('toObject', {
   }
 });
 
-module.exports = mongoose.model('Rewards', rewardsSchema);
+module.exports = mongoose.model('posts', postsSchema);
