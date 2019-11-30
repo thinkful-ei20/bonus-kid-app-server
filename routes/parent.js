@@ -3,7 +3,7 @@
 const express = require('express');
 const passport = require('passport');
 
-const Parent = require('../models/parent');
+const User = require('../models/parent');
 const Child = require('../models/child');
 const Rewards = require('../models/rewards');
 const Tasks = require('../models/tasks');
@@ -37,18 +37,18 @@ router.post('/', (req, res, next) => {
   tooBigOrTooSmall(req);
 
   // Create new Parent in DB
-  let { username, password, name, email, isParent } = req.body;
+  let { username, password, name, email, isAdvanced } = req.body;
 
-  return Parent.hashPassword(password)
+  return User.hashPassword(password)
     .then(digest => {
       const newUser = {
         username,
         password: digest,
         name,
         email,
-        isParent: true
+        isAdvanced: true
       };
-      return Parent.create(newUser);
+      return User.create(newUser);
     })
     .then(result => {
       return res.status(201)

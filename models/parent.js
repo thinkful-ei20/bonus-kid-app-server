@@ -3,20 +3,23 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const parentSchema = mongoose.Schema({
+// this will be the party creator user or the advanced user 
+// this used to be the parent schema
+const advancedUserSchema = mongoose.Schema({
   name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  isParent: { type: Boolean, required: true },
-  child: [
+  // isAdvanced: { type: Boolean, required: true }, need to come up with pro profile
+  email: { type: String, required: true, unique: true}
+  // child: [
 
-    { type: mongoose.Schema.ObjectId, ref: 'Child' }
+  //   { type: mongoose.Schema.ObjectId, ref: 'Child' }
 
-  ]
+  // ]
 });
 
-parentSchema.set('toObject', {
+advancedUserSchema.set('toObject', {
   transform: function (doc, ret) {
     ret.id = ret._id;
     delete ret._id;
@@ -25,12 +28,12 @@ parentSchema.set('toObject', {
   }
 });
 
-parentSchema.methods.validatePassword = function (password) {
+advancedUserSchema.methods.validatePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-parentSchema.statics.hashPassword = function (password) {
+advancedUserSchema.statics.hashPassword = function (password) {
   return bcrypt.hash(password, 10);
 };
 
-module.exports = mongoose.model('Parent', parentSchema);
+module.exports = mongoose.model('advancedUser', advancedUserSchema);
