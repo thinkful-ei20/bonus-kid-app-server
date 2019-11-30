@@ -10,18 +10,23 @@ const Parent = require('../models/parent');
 const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 const router = express.Router();
 
+// change this to fit the name of the app schemas
 const localAuth = passport.authenticate('localParent', { session: false, failWithError: true });
 const localChildAuth = passport.authenticate('localChild', { session: false, failWithError: true });
+
+router.get('/', (req, res) => {
+  return res.send('hello');
+});
 
 router.post('/login', localAuth, (req, res) => {
   const authToken = createAuthToken(req.user);
   return res.json({ authToken });
 });
 
-router.post('/childLogin', localChildAuth, (req, res) => {
-  const authToken = createAuthToken(req.user);
-  return res.json({ authToken });
-});
+// router.post('/childLogin', localChildAuth, (req, res) => {
+//   const authToken = createAuthToken(req.user);
+//   return res.json({ authToken });
+// });
 
 const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 // router.use('/refresh', passport.authenticate('jwt', {session: false, failWithError: true}));
